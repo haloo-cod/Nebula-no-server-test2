@@ -13,7 +13,16 @@ function callbackPage(status: 'success' | 'error', payload: unknown): string {
   const message = JSON.stringify(`authorization:github:${status}:${JSON.stringify(payload)}`)
   const title = status === 'success' ? 'Authorization complete. You can close this window.' : 'Authorization failed. You can close this window.'
   const detail = status === 'error' && payload && typeof payload === 'object' && 'error' in payload ? String(payload.error) : ''
-  return `<!doctype html><html><body><script>window.opener?.postMessage(${message}, '*');</script><p>${title}</p><p>${detail}</p></body></html>`
+  return `<!doctype html><html><body><script>
+    const authorizationMessage = ${message};
+    const sendAuthorization = () => {
+      if (!window.opener) return;
+      window.opener.postMessage(authorizationMessage, '*');
+      window.removeEventListener('message', sendAuthorization);
+    };
+    window.addEventListener('message', sendAuthorization);
+    window.opener?.postMessage('authorizing:github', '*');
+  </script><p>${title}</p><p>${detail}</p></body></html>`
 }
 
 export default async function handler(request: VercelRequest, response: VercelResponse) {
