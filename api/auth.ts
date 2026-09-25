@@ -19,7 +19,8 @@ function callbackPage(status: 'success' | 'error', payload: unknown): string {
 export default async function handler(request: VercelRequest, response: VercelResponse) {
   try {
     const { clientId, clientSecret, baseUrl } = getConfig()
-    const hasCode = typeof request.query.code === 'string' && request.query.code.length > 0
+    const code = typeof request.query.code === 'string' ? request.query.code : ''
+    const hasCode = code.length > 0
     const action = hasCode ? 'callback' : 'authorize'
     const callbackUrl = `${baseUrl}/api/auth`
     if (action === 'authorize') {
