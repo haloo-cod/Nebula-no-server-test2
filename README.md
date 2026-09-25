@@ -28,7 +28,7 @@ Nebula-no-server-test2/
 └── README.md
 ```
 
-## 内容管理
+推荐部署：Netlify。详细步骤见 `DEPLOY_NETLIFY.md`；它可以为 Decap CMS 提供 GitHub OAuth，不需要单独部署 Worker。
 
 内容目录位于 `src/content/`：
 
