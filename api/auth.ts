@@ -17,9 +17,9 @@ function callbackPage(status: 'success' | 'error', payload: unknown): string {
 export default async function handler(request: VercelRequest, response: VercelResponse) {
   try {
     const { clientId, clientSecret, baseUrl } = getConfig()
-    const action = request.query.action === 'callback' ? 'callback' : 'authorize'
-    const callbackUrl = `${baseUrl}/api/auth?action=callback`
-
+    const hasCode = typeof request.query.code === 'string' && request.query.code.length > 0
+    const action = hasCode ? 'callback' : 'authorize'
+    const callbackUrl = `${baseUrl}/api/auth`
     if (action === 'authorize') {
       const provider = typeof request.query.provider === 'string' ? request.query.provider : 'github'
       if (provider !== 'github') return response.status(400).send('Invalid provider')

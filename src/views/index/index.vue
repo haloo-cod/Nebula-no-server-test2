@@ -549,6 +549,6 @@ const containerClass = computed(() => {
   }
 }
 .home-panel-placeholder {
-  min-height: 14rem;
+  min-height: 23rem;
 }
 </style>
