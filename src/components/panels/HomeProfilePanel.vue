@@ -9,38 +9,18 @@
       </div>
     </div>
 
-    <!-- 底部：统计格子（左）+ 社交链接（右） -->
+    <!-- 统计格子固定在卡片右下区域。 -->
     <div class="hp-bottom">
-      <div class="hp-stats">
-        <div class="stat-box">
-          <span class="stat-value">{{ totalPosts }}</span>
-          <span class="stat-label">文章</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-value">{{ totalMoments }}</span>
-          <span class="stat-label">说说</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-value">{{ totalProjects }}</span>
-          <span class="stat-label">展览</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-value">{{ daysActive }}</span>
-          <span class="stat-label">活跃天数</span>
-        </div>
-      </div>
       <div class="hp-social" translate="no">
-        <a
-          v-for="link in links"
-          :key="link.label"
-          :href="link.url"
-          :title="link.label"
-          target="_blank"
-          rel="noopener"
-          class="hp-social-icon"
-        >
+        <a v-for="link in links" :key="link.label" :href="link.url" :title="link.label" target="_blank" rel="noopener" class="hp-social-icon">
           <SvgIcon :name="link.icon" class="hp-social-svg" />
         </a>
+      </div>
+      <div class="hp-stats">
+        <div class="stat-box"><span class="stat-value">{{ totalPosts }}</span><span class="stat-label">文章</span></div>
+        <div class="stat-box"><span class="stat-value">{{ totalMoments }}</span><span class="stat-label">说说</span></div>
+        <div class="stat-box"><span class="stat-value">{{ totalProjects }}</span><span class="stat-label">展览</span></div>
+        <div class="stat-box"><span class="stat-value">{{ daysActive }}</span><span class="stat-label">活跃天数</span></div>
       </div>
     </div>
   </div>

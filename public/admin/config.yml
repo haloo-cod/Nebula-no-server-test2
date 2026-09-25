@@ -2,9 +2,9 @@ backend:
   name: github
   repo: haloo-cod/Nebula-no-server-test2
   branch: main
-  site_domain: YOUR_NETLIFY_SITE.netlify.app
-  base_url: https://YOUR_NETLIFY_SITE.netlify.app
-  auth_endpoint: oauth
+  site_domain: nebula-no-server-test2.vercel.app
+  base_url: https://nebula-no-server-test2.vercel.app
+  auth_endpoint: /api/auth?action=authorize
 
 locale: zh_Hans
 

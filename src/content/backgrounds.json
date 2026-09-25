@@ -1,4 +1,10 @@
 {
-  "dark": { "desktop": [], "mobile": [] },
-  "light": { "desktop": [], "mobile": [] }
+  "dark": {
+    "desktop": [{ "src": "/assets/images/dark-desktop.webp", "mediaType": "image" }],
+    "mobile": []
+  },
+  "light": {
+    "desktop": [{ "src": "/assets/images/light-desktop-01.webp", "mediaType": "image" }],
+    "mobile": []
+  }
 }

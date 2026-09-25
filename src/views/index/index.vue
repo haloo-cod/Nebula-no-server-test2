@@ -39,10 +39,10 @@
             :ripple-trail="true"
             class="panel-liquid-glass"
           >
-            <DataDashboard />
+            <div class="home-panel-placeholder" aria-label="内容面板占位"></div>
           </LiquidGlass>
           <PanelFallbackGlass v-else static-blur>
-            <DataDashboard />
+            <div class="home-panel-placeholder" aria-label="内容面板占位"></div>
           </PanelFallbackGlass>
         </div>
       </div>
@@ -153,11 +153,9 @@
 import { ref, watch, computed, onUnmounted } from 'vue'
 import PanelFallbackGlass from '@/components/panels/PanelFallbackGlass.vue'
 import HomeProfilePanel from '@/components/panels/HomeProfilePanel.vue'
-import DataDashboard from '@/components/panels/DataDashboard.vue'
 import CalendarPanel from '@/components/panels/CalendarPanel.vue'
 import DigitalClockPanel from '@/components/panels/DigitalClockPanel.vue'
 import Carousel from '@/components/panels/Carousel.vue'
-import PostCarousel from '@/components/panels/PostCarousel.vue'
 import MomentCarousel from '@/components/panels/MomentCarousel.vue'
 import LiquidGlass from '@/components/liquid-glass/LiquidGlass.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
@@ -549,5 +547,8 @@ const containerClass = computed(() => {
   .bottom-right-bottom-inner > * {
     min-height: 280px;
   }
+}
+.home-panel-placeholder {
+  min-height: 14rem;
 }
 </style>

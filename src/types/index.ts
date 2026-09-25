@@ -48,15 +48,6 @@ export interface GalleryProject {
   content: string // Markdown 正文原文(渲染时才转 HTML)
 }
 
-/** 静态书单条目，可选外部详情链接，不包含 EPUB 文件。 */
-export interface Book {
-  slug: string
-  title: string
-  author: string
-  description: string
-  cover: string
-  url?: string
-}
 /** 相册中的单张照片 */
 export interface AlbumPhoto {
   url: string // 照片 URL,当前来自本地 assets,后续可换后端图床

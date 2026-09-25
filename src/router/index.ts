@@ -24,10 +24,11 @@ const routes: RouteRecordRaw[] = [
   { path: '/treasure', name: 'treasure', component: () => import('../views/treasure/treasure.vue') },
   { path: '/moments', name: 'moments', component: () => import('../views/moments/moments.vue') },
   { path: '/about', name: 'about', component: () => import('../views/about/about.vue') },
+  { path: '/study-room', name: 'study-room', component: () => import('../views/study-room/study-room.vue') },
 ]
 const seoPageKeys: Record<string, string> = {
-  index: 'index', archive: 'archive', books: 'books', images: 'images', gallery: 'gallery',
-  friends: 'friends', treasure: 'treasure', moments: 'moments', about: 'about',
+  index: 'index', archive: 'archive', images: 'images', gallery: 'gallery',
+  friends: 'friends', treasure: 'treasure', moments: 'moments', about: 'about', studyRoom: 'studyRoom',
 }
 const router = createRouter({ history: createWebHistory(import.meta.env.BASE_URL), routes })
 router.afterEach((to) => {

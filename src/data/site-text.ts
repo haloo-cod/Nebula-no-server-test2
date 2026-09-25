@@ -21,7 +21,6 @@ export const siteText: Record<string, PageText> = {
   images: { kicker: 'Images', title: '图片', subtitle: '分享好看的图片' },
   friends: { kicker: 'Friends', title: '友链', subtitle: '想做海洋馆的样子，收集互联网茫茫大海里有趣的朋友们。' },
   treasure: { kicker: 'Treasure', title: '藏宝阁', subtitle: '收集有趣的开源项目和实用工具，也会提供一些资源链接。' },
-  moments: { kicker: 'Moments', title: '说说', subtitle: '一些碎碎念，一些心情，一些生活的点滴。' },
   books: { kicker: 'Library', title: '书单', subtitle: '记录阅读和收藏的书籍，不提供 EPUB 在线阅读。' },
   gallery: { kicker: 'Projects', title: '项目', subtitle: '记录下自己做的一些项目' },
   blog: { kicker: 'Blog', title: '博文', subtitle: '记录下自己的一些想法和生活' },

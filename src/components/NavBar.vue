@@ -528,7 +528,6 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: '首页', path: '/', icon: 'home' },
   { label: '博文', path: '/blog', icon: 'article' },
-  { label: '图书', path: '/books', icon: 'book' },
   { label: '归档', path: '/archive', icon: 'archive' },
   { label: '展览', path: '/gallery', icon: 'gallery' },
   { label: '说说', path: '/moments', icon: 'tooltip' },
