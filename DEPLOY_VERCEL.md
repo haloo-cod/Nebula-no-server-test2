@@ -51,6 +51,7 @@ https://nebula-no-server-test2.vercel.app
 Authorization callback URL:
 https://nebula-no-server-test2.vercel.app/api/auth
 ```
+注意：当前 Vercel Function 会使用授权请求的同源 `/api/auth` 回调地址。GitHub OAuth App 的 callback URL 必须精确填写 `https://nebula-no-server-test2.vercel.app/api/auth`，不要添加 query 参数。
 
 ## 4. CMS 配置
 

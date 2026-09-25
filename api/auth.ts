@@ -40,7 +40,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret, code, redirect_uri: callbackUrl }).toString(),
+      body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret, code }).toString(),
     })
     const token = (await tokenResponse.json()) as { access_token?: string; error?: string; error_description?: string }
     if (!tokenResponse.ok || !token.access_token) {
