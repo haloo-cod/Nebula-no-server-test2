@@ -1,18 +1,12 @@
-# 本地预览资源
+# 本地程序资源与媒体说明
 
-这些目录保留前端 UI 开发时的资源结构，实际文件不纳入仓库。
+站点内容位于 `src/content/`，由 GitHub 仓库和 Decap CMS 管理。`src/assets/` 只保留程序资源、字体和可选的本地预览文件。
 
-- `backgrounds/desktop/dark/`：桌面端暗色主题背景图
-- `backgrounds/desktop/light/`：桌面端亮色主题背景图
-- `backgrounds/mobile/dark/`：移动端暗色主题背景图
-- `backgrounds/mobile/light/`：移动端亮色主题背景图
-- `carousel/`：首页轮播图
-- `albums/`：相册预览图
-- `post-covers/`：文章封面图
-- `post-images/`：文章正文图片
-- `tavern/`：深夜酒馆页面资源
-- `testepub/`：本地 EPUB 阅读器测试文件
-- `md/`：本地 Markdown 文章预览
-- `projects/`：本地 Gallery 项目文档预览
+- `backgrounds/`：可选的本地默认背景；正式背景也可以在 `src/content/backgrounds.json` 中使用完整外链。
+- `carousel/`：可选的本地轮播预览资源。
+- `post-covers/`：可选的本地文章封面资源。
+- `post-images/`：可选的本地文章正文图片。
+- `icons/`：站点图标。
+- `front/`：站点字体。
 
-生产环境中的内容和上传资源由 `blog-backend` 管理，通过 API 加载。
+文章、说说、友链、相册、展览、背景和轮播配置不再由后端 API 提供。图片和视频可以提交到 `public/assets/`，也可以填写 R2/CDN 等完整 URL。

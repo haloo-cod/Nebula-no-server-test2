@@ -32,10 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getPosts } from '@/data/posts'
-import { fetchPosts, toFrontendPost } from '@/api/posts'
 import type { Post } from '@/types'
 
 const router = useRouter()
@@ -52,18 +51,6 @@ const paused = ref(false)
 let timer: number | null = null
 const INTERVAL = 5000
 
-// 启动时尝试从 API 获取
-onMounted(async () => {
-  try {
-    const res = await fetchPosts(1, 5)
-    if (res.items.length > 0) {
-      slides.value = res.items.map(toFrontendPost)
-    }
-  } catch {
-    // 后端不可用时保持 glob 数据
-  }
-  resetTimer()
-})
 
 /** 分类 → 颜色 */
 const categoryColors: Record<string, string> = {

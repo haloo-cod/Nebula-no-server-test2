@@ -147,21 +147,6 @@
 
       <div class="perf-divider"></div>
 
-      <!-- 网络/API 探针(调试手机访问后端用) -->
-      <div class="perf-row perf-row--wrap">
-        <span class="perf-label">API Base</span>
-        <span class="perf-value perf-value--url">{{ apiBase || '(同域)' }}</span>
-      </div>
-      <div class="perf-row">
-        <span class="perf-label">API 延迟</span>
-        <span class="perf-value" :class="apiLatencyClass">{{ apiLatencyText }}</span>
-      </div>
-      <div class="perf-row perf-row--wrap" v-if="apiError">
-        <span class="perf-value perf-value--bad">{{ apiError }}</span>
-      </div>
-      <button class="perf-monitor__probe" type="button" @pointerdown.stop @click.stop="probeApi">
-        重测 API
-      </button>
     </div>
   </div>
 </template>
@@ -185,7 +170,6 @@ import {
   type RendererMetrics,
   type InstanceStats,
 } from '@/components/liquid-glass/liquidGlassRenderer'
-import { BASE_URL } from '@/api/client'
 
 const collapsed = ref(false)
 
@@ -366,45 +350,6 @@ function updateMemory() {
   }
 }
 
-// ============================================================================
-// API 网络探针(调试手机访问后端)
-// ============================================================================
-const apiBase = BASE_URL
-const apiLatency = ref<number | null>(null)
-const apiError = ref('')
-const apiProbing = ref(false)
-
-const apiLatencyText = computed(() => {
-  if (apiProbing.value) return '测试中…'
-  if (apiLatency.value === null) return '—'
-  return `${apiLatency.value} ms`
-})
-
-const apiLatencyClass = computed(() => {
-  if (apiError.value) return 'perf-value--bad'
-  if (apiLatency.value === null) return ''
-  if (apiLatency.value < 150) return 'perf-value--good'
-  if (apiLatency.value < 500) return 'perf-value--warn'
-  return 'perf-value--bad'
-})
-
-/** 请求 /health 测量后端可达性与延迟,失败时暴露具体错误(手机调试关键) */
-async function probeApi() {
-  apiProbing.value = true
-  apiError.value = ''
-  const start = performance.now()
-  try {
-    const res = await fetch(`${apiBase}/health`, { credentials: 'include' })
-    apiLatency.value = Math.round(performance.now() - start)
-    if (!res.ok) apiError.value = `HTTP ${res.status}`
-  } catch (e) {
-    apiLatency.value = null
-    // 网络层失败(CORS/连接拒绝/混合内容)会走到这里
-    apiError.value = e instanceof Error ? `${e.name}: ${e.message}` : '请求失败'
-  } finally {
-    apiProbing.value = false
-  }
-}
 
 onMounted(() => {
   updateViewport()
@@ -415,7 +360,6 @@ onMounted(() => {
     pollMetrics()
     updateMemory()
   }, 500)
-  void probeApi()
 })
 
 onUnmounted(() => {

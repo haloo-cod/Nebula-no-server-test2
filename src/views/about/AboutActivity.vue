@@ -91,27 +91,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { getPosts } from '@/data/posts'
-import { fetchProfile } from '@/api/profile'
-import { fetchPosts, toFrontendPost } from '@/api/posts'
-import { fetchMoments } from '@/api/moments'
-import { fetchAlbums } from '@/api/albums'
+import { getAllMoments } from '@/data/moments'
+import { getAlbums } from '@/data/albums'
+import { profile, avatar } from '@/data/profile'
 import type { ActivityRecord } from '@/types'
 
-const activeAvatar = ref('')
-const activeName = ref('Starlit')
-
-onMounted(async () => {
-  try {
-    const profileData = await fetchProfile()
-    if (profileData.avatarUrl) activeAvatar.value = profileData.avatarUrl
-    if (profileData.profile.name) activeName.value = profileData.profile.name
-  } catch {
-    // API 不可用时使用默认值
-  }
-})
+const activeAvatar = ref(avatar)
+const activeName = ref(profile.name)
 
 // 从本地 getPosts() 生成 fallback 活动记录
 function buildFallbackActivities(): ActivityRecord[] {
@@ -128,7 +117,6 @@ function buildFallbackActivities(): ActivityRecord[] {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
 
-const activities = ref<ActivityRecord[]>(buildFallbackActivities())
 
 // 热力图横向拖拽状态
 const heatmapScrollRef = ref<HTMLElement | null>(null)
@@ -173,69 +161,30 @@ function onHeatmapClick(event: MouseEvent) {
   if (hasHeatmapDragged.value) event.stopPropagation()
 }
 
-// 从后端 API 加载多类型活动
-onMounted(async () => {
-  try {
-    const [postsResp, momentsResp, albumsResp] = await Promise.all([
-      fetchPosts(1, 200).catch(() => null),
-      fetchMoments(1, 50).catch(() => null),
-      fetchAlbums().catch(() => null),
-    ])
-
-    const records: ActivityRecord[] = []
-
-    // 博文活动
-    if (postsResp && postsResp.items) {
-      for (const p of postsResp.items) {
-        const post = toFrontendPost(p)
-        if (!post.draft && post.date) {
-          records.push({
-            id: `post-${post.slug}`,
-            type: '文章',
-            title: post.title,
-            date: post.date,
-            url: `/post/${post.slug}`,
-          })
-        }
-      }
-    }
-
-    // 说说活动
-    if (momentsResp && momentsResp.items) {
-      for (const m of momentsResp.items) {
-        const title = m.content.length > 20 ? m.content.slice(0, 20) + '...' : m.content
-        records.push({
-          id: `moment-${m.id}`,
-          type: '说说',
-          title,
-          date: m.date,
-          url: `/moments#moment-${m.id}`,
-        })
-      }
-    }
-
-    // 相册活动
-    if (albumsResp) {
-      for (const album of albumsResp) {
-        records.push({
-          id: `album-${album.id}`,
-          type: '相册',
-          title: album.title,
-          date: album.date ? `${album.date.replace('.', '-')}-01` : '',
-          url: '/images',
-        })
-      }
-    }
-
-    if (records.length > 0) {
-      activities.value = records.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      )
-    }
-  } catch {
-    // API 失败，保留 fallback 数据
+function buildActivities(): ActivityRecord[] {
+  const records: ActivityRecord[] = buildFallbackActivities()
+  for (const moment of getAllMoments()) {
+    records.push({
+      id: `moment-${moment.id}`,
+      type: '说说',
+      title: moment.content.length > 20 ? `${moment.content.slice(0, 20)}...` : moment.content,
+      date: moment.date,
+      url: `/moments#moment-${moment.id}`,
+    })
   }
-})
+  for (const album of getAlbums()) {
+    records.push({
+      id: `album-${album.id}`,
+      type: '相册',
+      title: album.title,
+      date: album.date ? `${album.date.replace('.', '-')}-01` : '',
+      url: '/images',
+    })
+  }
+  return records.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
+
+const activities = ref<ActivityRecord[]>(buildActivities())
 
 // 最近的活动（时间线显示前 15 条）
 const recentActivities = computed(() => activities.value.slice(0, 15))

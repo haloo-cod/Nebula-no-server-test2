@@ -34,7 +34,6 @@
           </div>
 
           <div class="prose" v-html="html"></div>
-          <AboutComments :page-key="`post:${currentPost.slug}`" />
         </div>
 
         <div v-else class="post-state">文章不存在</div>
@@ -47,12 +46,8 @@
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import GlassPanel from '@/components/panels/GlassPanel.vue'
-import { getPost, renderPost, renderMarkdown } from '@/data/posts'
-import { fetchPost } from '@/api/posts'
-import { resolveUrl } from '@/api/client'
-import AboutComments from '@/views/about/AboutComments.vue'
+import { getPost, renderPost } from '@/data/posts'
 import type { Post } from '@/types'
-
 const route = useRoute()
 const router = useRouter()
 const currentPost = ref<Post | null>(null)
@@ -80,35 +75,15 @@ function catColorKey(cat: string): string {
 
 async function load(slug: string) {
   loading.value = true
-  try {
-    // 优先从后端 API 获取
-    const detail = await fetchPost(slug)
-    currentPost.value = {
-      slug: detail.slug,
-      title: detail.title,
-      description: detail.description,
-      date: detail.date,
-      cover: resolveUrl(detail.cover_url),
-      tags: detail.tags,
-      category: detail.category,
-      draft: detail.is_draft,
-      pinned: detail.is_pinned,
-      content: detail.content_md,
-    }
-    // 用前端 marked + highlight.js 渲染 Markdown
-    html.value = detail.content_md ? await renderMarkdown(detail.content_md) : ''
-  } catch {
-    // 后端不可用时 fallback 到本地 glob 数据
-    const post = getPost(slug)
-    if (!post) {
-      currentPost.value = null
-      html.value = ''
-      loading.value = false
-      return
-    }
-    currentPost.value = post
-    html.value = (await renderPost(slug)) || ''
+  const post = getPost(slug)
+  if (!post) {
+    currentPost.value = null
+    html.value = ''
+    loading.value = false
+    return
   }
+  currentPost.value = post
+  html.value = (await renderPost(slug)) || ''
   loading.value = false
 }
 

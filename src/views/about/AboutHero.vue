@@ -35,33 +35,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import SvgIcon from '@/components/SvgIcon.vue'
-import { fetchProfile } from '@/api/profile'
-import { api, resolveUrl } from '@/api/client'
-
-const activeAvatar = ref('')
-const activeCoverImage = ref('')
-const activeName = ref('Starlit')
-const activeSocialLinks = ref<Array<{ label: string; icon: string; url: string }>>([])
-
-onMounted(async () => {
-  try {
-    const profileData = await fetchProfile()
-    if (profileData.avatarUrl) activeAvatar.value = profileData.avatarUrl
-    if (profileData.coverUrl) activeCoverImage.value = profileData.coverUrl
-    if (profileData.profile.name) activeName.value = profileData.profile.name
-    activeSocialLinks.value = profileData.socialLinks
-  } catch {
-    // API 不可用时使用空值占位
-  }
-  try {
-    const content = await api.get<{ cover_url: string }>('/api/v1/about/content')
-    if (content.cover_url) activeCoverImage.value = resolveUrl(content.cover_url)
-  } catch {
-    // API 不可用时继续
-  }
-})
+import { avatar, coverImage, profile, socialLinks } from '@/data/profile'
+const activeAvatar = ref(avatar)
+const activeCoverImage = ref(coverImage)
+const activeName = ref(profile.name)
+const activeSocialLinks = ref(socialLinks)
 </script>
 
 <style scoped>

@@ -7,27 +7,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { api } from '@/api/client'
 import { renderMarkdown } from '@/data/posts'
-
+import aboutMarkdown from '@/content/about.md?raw'
 const html = ref('')
 const loading = ref(true)
 
 // 默认 fallback 内容（后端不可用时显示）
-const fallbackMd = `## 你好，我是 Starlit
-
-一个喜欢折腾前端和探索新技术的开发者。`
-
 onMounted(async () => {
-  let md = fallbackMd
-  try {
-    // 从后端 API 获取 about.md 内容
-    const res = await api.get<{ content_md: string }>('/api/v1/about/content')
-    if (res.content_md) md = res.content_md
-  } catch {
-    // 后端不可用时使用 fallback
-  }
-  html.value = await renderMarkdown(md)
+  html.value = await renderMarkdown(aboutMarkdown)
   loading.value = false
 })
 </script>

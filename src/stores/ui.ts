@@ -11,8 +11,6 @@ import {
   mobileLightBackgrounds as defaultMobileLightBgs,
 } from '@/data/backgrounds'
 import type { BackgroundItem } from '@/data/backgrounds'
-import { isVideoBackground } from '@/data/backgrounds'
-import { fetchBackgrounds } from '@/api/backgrounds'
 
 /** 站点主题:dark=暗色(默认),light=亮色 */
 export type Theme = 'dark' | 'light'
@@ -367,60 +365,13 @@ export const useUIStore = defineStore('ui', () => {
     themeTransitionRevealStarted.value = false
   }
 
-  /**
-   * 从后端 API 加载背景图列表，替换静态 fallback
-   * 应在 App.vue 的 onMounted 中调用
-   */
-  async function loadBackgrounds() {
-    try {
-      const [darkDesktop, lightDesktop, darkMobile, lightMobile] = await Promise.all([
-        fetchBackgrounds('dark', 'desktop'),
-        fetchBackgrounds('light', 'desktop'),
-        fetchBackgrounds('dark', 'mobile'),
-        fetchBackgrounds('light', 'mobile'),
-      ])
-
-      // 保留媒体元数据；视频若被降级成 image，LiquidGlass 会错误地用 Image 加载并导致黑屏。
-      darkBgs.value = darkDesktop.map((i) => ({
-        src: i.url,
-        mediaType: isVideoBackground(i) ? 'video' : 'image',
-        posterUrl: i.posterUrl,
-        mimeType: i.mimeType,
-        fileSize: i.fileSize,
-      }))
-      lightBgs.value = lightDesktop.map((i) => ({
-        src: i.url,
-        mediaType: isVideoBackground(i) ? 'video' : 'image',
-        posterUrl: i.posterUrl,
-        mimeType: i.mimeType,
-        fileSize: i.fileSize,
-      }))
-      mobileDarkBgs.value = darkMobile.map((i) => ({
-        src: i.url,
-        mediaType: isVideoBackground(i) ? 'video' : 'image',
-        posterUrl: i.posterUrl,
-        mimeType: i.mimeType,
-        fileSize: i.fileSize,
-      }))
-      mobileLightBgs.value = lightMobile.map((i) => ({
-        src: i.url,
-        mediaType: isVideoBackground(i) ? 'video' : 'image',
-        posterUrl: i.posterUrl,
-        mimeType: i.mimeType,
-        fileSize: i.fileSize,
-      }))
-
-      // 索引越界修正（API 返回的列表可能比 localStorage 存的索引短）
-      if (darkBgIndex.value >= darkBgs.value.length) darkBgIndex.value = 0
-      if (lightBgIndex.value >= lightBgs.value.length) lightBgIndex.value = 0
-      if (mobileDarkBgIndex.value >= mobileDarkBgs.value.length) mobileDarkBgIndex.value = 0
-      if (mobileLightBgIndex.value >= mobileLightBgs.value.length) mobileLightBgIndex.value = 0
-    } catch (error) {
-      console.error('[UI] Failed to load backgrounds', error)
-      // API 失败时保持 CSS 纯色背景，不依赖本地图片
-    }
+  /** 使用构建时读取的 GitHub 内容背景配置。 */
+  function loadBackgrounds() {
+    if (darkBgs.value.length === 0) darkBgIndex.value = 0
+    if (lightBgs.value.length === 0) lightBgIndex.value = 0
+    if (mobileDarkBgs.value.length === 0) mobileDarkBgIndex.value = 0
+    if (mobileLightBgs.value.length === 0) mobileLightBgIndex.value = 0
   }
-
   return {
     showNavbar,
     theme,

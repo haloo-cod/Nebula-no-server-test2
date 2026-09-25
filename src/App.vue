@@ -8,13 +8,11 @@ import RainEffect from './components/RainEffect.vue'
 import PageBackground from './components/PageBackground.vue'
 import PerfMonitor from './components/liquid-glass/PerfMonitor.vue'
 import { useUIStore } from '@/stores/ui'
-import { useAuthStore } from '@/stores/auth'
 import { preloadTexture, preloadVideoTexture } from '@/components/liquid-glass/liquidGlassRenderer'
 import { isVideoBackground } from '@/data/backgrounds'
 
-const ui = useUIStore()
-const auth = useAuthStore()
 const route = useRoute()
+const ui = useUIStore()
 const hideChrome = computed(() => route.meta.hideChrome === true)
 const hideRain = computed(() => route.meta.hideRain === true)
 const showBackground = computed(() => !hideChrome.value && route.meta.hideBackground !== true)
@@ -47,16 +45,7 @@ onMounted(() => {
   // 避免首个 LiquidGlass 挂载时在主线程同步上传大图造成首帧卡顿。
   void preloadCurrentBackground()
 
-  // 从后端加载背景图列表（替换静态 fallback），加载完成后预热新 URL
-  ui.loadBackgrounds().then(() => {
-    void preloadCurrentBackground()
-  })
-
-  if (auth.token || route.meta.requiresAuth || route.path === '/auth/callback') {
-    void auth.init()
-  } else {
-    auth.initialized = true
-  }
+  ui.loadBackgrounds()
 })
 
 // 主题切换或背景图手动切换时预热新纹理,下次玻璃刷新时直接命中缓存

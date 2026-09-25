@@ -1,11 +1,27 @@
+import friendContent from '@/content/friends.json'
 import type { Friend } from '@/types'
 
-/**
- * 友链静态数据层。 以替换后端接口
- */
-const friends: Friend[] = []
+interface FriendContent {
+  items: Friend[]
+  exchange: {
+    enabled: boolean
+    name: string
+    url: string
+    avatar: string
+    bio: string
+    requirements: string[]
+    contact: string
+  }
+}
 
-/** 获取全部友链 */
+const content = friendContent as FriendContent
+
+/** 获取 GitHub 内容目录中的全部友链。 */
 export function getFriends(): Friend[] {
-  return friends
+  return content.items
+}
+
+/** 获取友链交换页面展示信息。 */
+export function getFriendExchangeInfo(): FriendContent['exchange'] {
+  return content.exchange
 }

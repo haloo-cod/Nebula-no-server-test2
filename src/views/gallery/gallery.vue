@@ -20,26 +20,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import GlassProjectLink from '@/components/gallery/GlassProjectLink.vue'
 import { getGalleryProjects } from '@/data/gallery'
-import { fetchGalleryProjects, toFrontendGalleryProject } from '@/api/gallery'
 import { siteText } from '@/data/site-text'
 import type { GalleryProject } from '@/types'
 
 const projects = ref<GalleryProject[]>(getGalleryProjects())
 
-// 启动时尝试从后端 API 加载（fallback 到 glob）
-onMounted(async () => {
-  try {
-    const items = await fetchGalleryProjects()
-    if (items.length > 0) {
-      projects.value = items.map(toFrontendGalleryProject)
-    }
-  } catch {
-    // 后端不可用时保持 glob 数据
-  }
-})
 </script>
 
 <style scoped>

@@ -150,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
+import { ref, watch, computed, onUnmounted } from 'vue'
 import PanelFallbackGlass from '@/components/panels/PanelFallbackGlass.vue'
 import HomeProfilePanel from '@/components/panels/HomeProfilePanel.vue'
 import DataDashboard from '@/components/panels/DataDashboard.vue'
@@ -167,7 +167,6 @@ import {
   profile as fallbackProfile,
   socialLinks as fallbackLinks,
 } from '@/data/profile'
-import { fetchProfile } from '@/api/profile'
 import type { SocialLink } from '@/types'
 
 const ui = useUIStore()
@@ -208,18 +207,6 @@ watch(typewriterDone, (val) => {
   }
 })
 
-onMounted(async () => {
-  // 从后端 API 加载个人资料
-  try {
-    const data = await fetchProfile()
-    if (data.profile.name) profileName.value = data.profile.name
-    if (data.profile.bio) profileBio.value = data.profile.bio
-    if (data.avatarUrl) profileAvatar.value = data.avatarUrl
-    profileLinks.value = data.socialLinks
-  } catch {
-    // API 失败，保留本地 fallback
-  }
-})
 
 onUnmounted(() => {
   ui.showNavbar = true

@@ -108,11 +108,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import LazyLiquidGlass from '@/components/liquid-glass/LazyLiquidGlass.vue'
 import { getPosts } from '@/data/posts'
-import { fetchPosts, toFrontendPost } from '@/api/posts'
 import { useUIStore } from '@/stores/ui'
 import ArchivePostCard from './ArchivePostCard.vue'
 import type { Post } from '@/types'
@@ -120,17 +119,6 @@ import type { Post } from '@/types'
 const ui = useUIStore()
 const posts = ref<Post[]>(getPosts().filter((p) => !p.draft))
 
-// 启动时尝试从后端 API 加载（fallback 到 glob）
-onMounted(async () => {
-  try {
-    const res = await fetchPosts(1, 200)
-    if (res.items.length > 0) {
-      posts.value = res.items.map(toFrontendPost)
-    }
-  } catch {
-    // 后端不可用时保持 glob 数据
-  }
-})
 
 // ============ 拖拽滑动 ============
 const viewportRef = ref<HTMLElement | null>(null)

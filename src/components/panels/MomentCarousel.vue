@@ -32,74 +32,44 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { fetchMoments } from '@/api/moments'
+import { getAllMoments } from '@/data/moments'
 import type { Moment } from '@/types'
 
 const router = useRouter()
-
-// 首页说说只使用后端数据，API 不可用时显示空状态
-const slides = ref<Moment[]>([])
-
+const slides = ref<Moment[]>(getAllMoments().slice(0, 5))
 const current = ref(0)
 const paused = ref(false)
 let timer: number | null = null
 const INTERVAL = 6000
 
-// 启动时尝试从 API 获取
-onMounted(async () => {
-  try {
-    const res = await fetchMoments(1, 5)
-    if (res.items.length > 0) {
-      slides.value = res.items
-    }
-  } catch {
-    // 后端不可用时保持空状态
-  }
-  resetTimer()
-})
-
-/** 相对时间 */
 function relativeTime(dateStr: string): string {
-  const now = Date.now()
-  const d = new Date(dateStr).getTime()
-  const diff = now - d
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
-
-  if (minutes < 1) return '刚刚'
-  if (minutes < 60) return `${minutes}分钟前`
-  if (hours < 24) return `${hours}小时前`
-  if (days < 30) return `${days}天前`
-
   const date = new Date(dateStr)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  return Number.isNaN(date.getTime()) ? dateStr : date.toLocaleDateString('zh-CN')
 }
 
-/** 根据索引计算 slide 的 CSS class */
-function slideClass(i: number): string {
-  if (i === current.value) return 'slide--active'
-  const prev = (current.value - 1 + slides.value.length) % slides.value.length
-  if (i === prev) return 'slide--prev'
-  return 'slide--next'
+function slideClass(index: number): string {
+  if (index === current.value) return 'slide--active'
+  const previous = (current.value - 1 + slides.value.length) % slides.value.length
+  return index === previous ? 'slide--prev' : 'slide--next'
 }
 
 function next() {
-  if (slides.value.length === 0) return
+  if (paused.value || slides.value.length === 0) return
   current.value = (current.value + 1) % slides.value.length
 }
 
-function goTo(i: number) {
-  current.value = i
+function goTo(index: number) {
+  current.value = index
   resetTimer()
 }
 
+function handleClick() {
+  if (slides.value[current.value]) void router.push(`/moments#moment-${slides.value[current.value].id}`)
+}
+
 function resetTimer() {
-  if (timer) clearInterval(timer)
-  timer = window.setInterval(() => {
-    if (!paused.value) next()
-  }, INTERVAL)
+  if (timer !== null) window.clearInterval(timer)
+  if (slides.value.length > 1) timer = window.setInterval(next, INTERVAL)
 }
 
 function pause() {
@@ -110,17 +80,11 @@ function resume() {
   paused.value = false
 }
 
-/** 点击跳转到说说页对应位置 */
-function handleClick() {
-  const moment = slides.value[current.value]
-  if (moment) {
-    router.push({ path: '/moments', hash: `#moment-${moment.id}` })
-  }
-}
-
+onMounted(resetTimer)
 onUnmounted(() => {
-  if (timer) clearInterval(timer)
+  if (timer !== null) window.clearInterval(timer)
 })
+
 </script>
 
 <style scoped>

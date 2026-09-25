@@ -72,7 +72,7 @@ import { useRoute } from 'vue-router'
 import LazyLiquidGlass from '@/components/liquid-glass/LazyLiquidGlass.vue'
 import PanelFallbackGlass from '@/components/panels/PanelFallbackGlass.vue'
 import { useUIStore } from '@/stores/ui'
-import { fetchMoments } from '@/api/moments'
+import { getAllMoments } from '@/data/moments'
 import { siteText } from '@/data/site-text'
 import type { Moment } from '@/types'
 import MomentCard from './MomentCard.vue'
@@ -100,32 +100,23 @@ function closeDetail() {
 // ============ 无限滚动分页 ============
 
 const PAGE_SIZE = 10
+const allMoments = getAllMoments()
 const allLoaded = ref<Moment[]>([])
-const total = ref(0)
+const total = allMoments.length
 const currentPage = ref(0)
 const loadingMore = ref(false)
 const noMore = ref(false)
 const sentinelRef = ref<HTMLElement | null>(null)
 let observer: IntersectionObserver | null = null
 
-async function loadNextPage() {
+function loadNextPage() {
   if (loadingMore.value || noMore.value) return
   loadingMore.value = true
   currentPage.value++
-
-  try {
-    // 优先从后端 API 获取
-    const res = await fetchMoments(currentPage.value, PAGE_SIZE)
-    total.value = res.total
-    allLoaded.value = [...allLoaded.value, ...res.items]
-  } catch {
-    total.value = 0
-    noMore.value = true
-  }
-
-  if (allLoaded.value.length >= total.value) {
-    noMore.value = true
-  }
+  const start = (currentPage.value - 1) * PAGE_SIZE
+  allLoaded.value = [...allLoaded.value, ...allMoments.slice(start, start + PAGE_SIZE)]
+  noMore.value = allLoaded.value.length >= total
+  loadingMore.value = true
   loadingMore.value = false
 }
 

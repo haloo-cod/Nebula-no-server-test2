@@ -173,12 +173,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import LiquidGlass from '@/components/liquid-glass/LiquidGlass.vue'
 import PanelFallbackGlass from '@/components/panels/PanelFallbackGlass.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
-import { getFriends } from '@/data/friends'
-import { fetchFriends, fetchFriendExchangeInfo, type FriendExchangeInfo } from '@/api/friends'
+import { getFriendExchangeInfo, getFriends } from '@/data/friends'
 import { siteText } from '@/data/site-text'
 import { useUIStore } from '@/stores/ui'
 import { useFloatingAvatars } from '@/composables/useFloatingAvatars'
@@ -187,15 +186,7 @@ const ui = useUIStore()
 const friends = ref(getFriends())
 const aquariumRef = ref<HTMLElement | null>(null)
 
-// 交换友链占位信息，后续替换为真实内容
-const exchangeInfo = ref<FriendExchangeInfo>({
-  name: '你的站点名称',
-  url: 'https://example.com',
-  avatar: 'https://api.dicebear.com/9.x/adventurer/svg?seed=myblog',
-  bio: '这里填写你的站点简介。',
-  requirements: ['原创内容优先', '站点稳定可访问', '无违法违规内容', '最好有定期更新'],
-  contact: 'your-email@example.com',
-})
+const exchangeInfo = ref(getFriendExchangeInfo())
 
 const {
   items: floatingItems,
@@ -209,21 +200,7 @@ const {
   speed: 0.8,
 })
 
-// 尝试从后端 API 加载友链列表
-onMounted(async () => {
-  try {
-    const [apiFriends, apiExchangeInfo] = await Promise.all([
-      fetchFriends(),
-      fetchFriendExchangeInfo(),
-    ])
-    if (apiFriends.length > 0) {
-      friends.value = apiFriends
-    }
-    exchangeInfo.value = apiExchangeInfo
-  } catch {
-    // API 失败，保留本地 fallback 数据
-  }
-})
+// 友链与交换信息在构建时读取 GitHub 内容文件。
 </script>
 
 <style scoped>

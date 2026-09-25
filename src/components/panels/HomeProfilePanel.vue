@@ -47,27 +47,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
 import type { SocialLink } from '@/types'
 import SvgIcon from '@/components/SvgIcon.vue'
-import { fetchContentStats } from '@/api/content-stats'
+import { getPosts } from '@/data/posts'
+import { getAllMoments } from '@/data/moments'
+import { getGalleryProjects } from '@/data/gallery'
 
-const totalPosts = ref(0)
-const totalMoments = ref(0)
-const totalProjects = ref(0)
-const daysActive = ref(0)
-
-onMounted(async () => {
-  try {
-    const stats = await fetchContentStats()
-    totalPosts.value = stats.posts
-    totalMoments.value = stats.moments
-    totalProjects.value = stats.gallery_projects
-    daysActive.value = stats.active_days
-  } catch {
-    // 后端不可用时保持零值，避免显示过期静态统计
-  }
-})
+const totalPosts = getPosts().filter((post) => !post.draft).length
+const totalMoments = getAllMoments().length
+const totalProjects = getGalleryProjects().length
+const daysActive = 0
 
 withDefaults(
   defineProps<{

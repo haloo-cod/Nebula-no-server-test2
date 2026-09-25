@@ -1,0 +1,128 @@
+backend:
+  name: github
+  repo: haloo-cod/Nebula-no-server-test2
+  branch: main
+  site_domain: haloo-cod.github.io
+  base_url: https://haloo-cod.github.io/Nebula-no-server-test2
+  auth_endpoint: oauth
+
+locale: zh_Hans
+
+media_folder: "public/assets/images"
+public_folder: "/assets/images"
+
+collections:
+  - name: posts
+    label: 文章
+    folder: src/content/posts
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: title, label: 标题, widget: string }
+      - { name: published, label: 发布日期, widget: datetime, required: false }
+      - { name: updated, label: 更新日期, widget: datetime, required: false }
+      - { name: description, label: 摘要, widget: text, required: false }
+      - { name: cover, label: 封面, widget: image, required: false }
+      - { name: tags, label: 标签, widget: list, required: false, default: [] }
+      - { name: category, label: 分类, widget: string, required: false }
+      - { name: draft, label: 草稿, widget: boolean, default: false }
+      - { name: pinned, label: 置顶, widget: boolean, default: false }
+      - { name: body, label: 正文, widget: markdown }
+
+  - name: gallery
+    label: 展览项目
+    folder: src/content/gallery
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: title, label: 标题, widget: string }
+      - { name: description, label: 描述, widget: text, required: false }
+      - { name: tags, label: 标签, widget: list, required: false, default: [] }
+      - { name: status, label: 状态, widget: string, required: false }
+      - { name: year, label: 年份, widget: string, required: false }
+      - { name: featured, label: 精选, widget: boolean, default: false }
+      - { name: body, label: 文档, widget: markdown }
+
+  - name: moments
+    label: 说说
+    files:
+      - name: moments
+        label: 说说列表
+        file: src/content/moments.json
+        fields:
+          - name: items
+            label: 说说
+            widget: list
+            required: false
+            fields:
+              - { name: id, label: 标识, widget: string }
+              - { name: date, label: 日期, widget: datetime }
+              - { name: content, label: 内容, widget: text }
+              - { name: mood, label: 心情, widget: string, required: false }
+              - { name: tags, label: 标签, widget: list, required: false }
+              - { name: images, label: 图片, widget: list, required: false, field: { name: url, widget: image } }
+
+  - name: site-data
+    label: 站点数据
+    files:
+      - name: friends
+        label: 友链
+        file: src/content/friends.json
+        fields:
+          - name: items
+            label: 友链
+            widget: list
+            fields:
+              - { name: name, label: 名称, widget: string }
+              - { name: bio, label: 简介, widget: string }
+              - { name: avatar, label: 头像, widget: image }
+              - { name: url, label: 地址, widget: string }
+      - name: profile
+        label: 个人资料
+        file: src/content/profile.json
+        fields:
+          - { name: name, label: 昵称, widget: string }
+          - { name: bio, label: 简介, widget: text }
+          - { name: avatar, label: 头像, widget: image, required: false }
+          - { name: cover, label: 封面, widget: image, required: false }
+          - name: socialLinks
+            label: 社交链接
+            widget: list
+            required: false
+            fields:
+              - { name: label, label: 名称, widget: string }
+              - { name: icon, label: 图标, widget: string }
+              - { name: url, label: 地址, widget: string }
+      - name: backgrounds
+        label: 背景
+        file: src/content/backgrounds.json
+        fields:
+          - { name: dark, label: 暗色背景, widget: object }
+          - { name: light, label: 亮色背景, widget: object }
+      - name: carousel
+        label: 首页轮播
+        file: src/content/carousel.json
+        fields:
+          - name: items
+            label: 轮播图
+            widget: list
+            required: false
+            fields:
+              - { name: src, label: 图片, widget: image }
+              - { name: alt, label: 描述, widget: string, required: false }
+      - name: treasures
+        label: 藏宝阁
+        file: src/content/treasures.json
+        fields:
+          - name: items
+            label: 条目
+            widget: list
+            required: false
+            fields:
+              - { name: slug, label: 标识, widget: string }
+              - { name: title, label: 标题, widget: string }
+              - { name: description, label: 描述, widget: text }
+              - { name: category, label: 分类, widget: string }
+              - { name: icon, label: 图标, widget: string }
+              - { name: url, label: 地址, widget: string }
+              - { name: tags, label: 标签, widget: list, required: false }

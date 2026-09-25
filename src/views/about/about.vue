@@ -33,7 +33,6 @@
             <AboutActivity />
           </div>
         </div>
-        <AboutComments v-show="activeTab === 'intro'" />
       </div>
     </LiquidGlass>
 
@@ -60,7 +59,6 @@
             <AboutActivity />
           </div>
         </div>
-        <AboutComments v-show="activeTab === 'intro'" />
       </div>
     </PanelFallbackGlass>
   </div>
@@ -74,7 +72,6 @@ import AboutHero from './AboutHero.vue'
 import AboutTabs from './AboutTabs.vue'
 import AboutIntro from './AboutIntro.vue'
 import AboutActivity from './AboutActivity.vue'
-import AboutComments from './AboutComments.vue'
 import { useUIStore } from '@/stores/ui'
 
 const ui = useUIStore()

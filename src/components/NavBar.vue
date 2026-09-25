@@ -56,20 +56,6 @@
 
     <!-- 右侧功能区（仅桌面端可见） -->
     <div class="nav-actions">
-      <template v-if="!auth.isLoggedIn">
-        <button class="auth-btn" type="button" @click="router.push('/login')">登录</button>
-        <button class="auth-btn auth-btn--primary" type="button" @click="router.push('/register')">
-          注册
-        </button>
-      </template>
-      <template v-else>
-        <button v-if="auth.isAdmin" class="auth-btn" type="button" @click="router.push('/admin')">
-          后台
-        </button>
-        <button class="auth-btn auth-btn--primary" type="button" @click="logoutUser">
-          {{ auth.user?.display_name || auth.user?.username }}
-        </button>
-      </template>
       <button
         class="theme-pull-switch"
         :class="{ 'is-moon': themeIcon === 'moon', 'is-dragging': isThemeDragging }"
@@ -266,26 +252,6 @@
     <!-- 移动端下拉菜单 -->
     <Transition name="menu-slide">
       <ul v-if="menuOpen" class="mobile-menu">
-        <li class="mobile-auth-row">
-          <template v-if="!auth.isLoggedIn">
-            <button class="mobile-auth-btn" type="button" @click="goToAuth('/login')">登录</button>
-            <button
-              class="mobile-auth-btn mobile-auth-btn--primary"
-              type="button"
-              @click="goToAuth('/register')"
-            >
-              注册
-            </button>
-          </template>
-          <button
-            v-else
-            class="mobile-auth-btn mobile-auth-btn--primary"
-            type="button"
-            @click="logoutUser"
-          >
-            退出 {{ auth.user?.display_name || auth.user?.username }}
-          </button>
-        </li>
         <li class="mobile-menu-divider" aria-hidden="true"></li>
         <li v-for="item in navItems" :key="item.path">
           <RouterLink
@@ -315,10 +281,8 @@ import { getCurrentLang, setLang, getLangLabel } from '@/i18n'
 import SvgIcon from '@/components/SvgIcon.vue'
 import BackgroundPicker from '@/components/BackgroundPicker.vue'
 import { useUIStore } from '@/stores/ui'
-import { useAuthStore } from '@/stores/auth'
 
 const ui = useUIStore()
-const auth = useAuthStore()
 const currentLang = ref(getCurrentLang())
 const langOpen = ref(false)
 const translateRef = ref<HTMLElement | null>(null)
@@ -589,17 +553,6 @@ function closeMenu() {
   menuOpen.value = false
 }
 
-/** 跳转前台认证页面并关闭移动菜单。 */
-function goToAuth(path: '/login' | '/register') {
-  closeMenu()
-  void router.push(path)
-}
-
-/** 退出前台账户并关闭移动菜单。 */
-async function logoutUser() {
-  await auth.logout()
-  closeMenu()
-}
 
 onMounted(() => {
   document.addEventListener('click', onDocumentClick)

@@ -57,7 +57,6 @@
               </span>
               <span v-for="tag in tagsOf(post)" :key="tag" class="post-tag">#{{ tag }}</span>
             </div>
-            <span class="comment-badge">💬 {{ getCommentCount(post.slug) }}</span>
           </article>
         </LiquidGlass>
 
@@ -79,7 +78,6 @@
             </span>
             <span v-for="tag in tagsOf(post)" :key="tag" class="post-tag">#{{ tag }}</span>
           </div>
-          <span class="comment-badge">💬 {{ getCommentCount(post.slug) }}</span>
         </PanelFallbackGlass>
       </RouterLink>
     </TransitionGroup>
@@ -111,16 +109,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import PanelFallbackGlass from '@/components/panels/PanelFallbackGlass.vue'
 import LiquidGlass from '@/components/liquid-glass/LiquidGlass.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import { getPosts } from '@/data/posts'
-import { fetchPosts, toFrontendPost } from '@/api/posts'
 import { siteText } from '@/data/site-text'
 import { useUIStore } from '@/stores/ui'
-import { fetchBatchCommentCount } from '@/api/comments'
 import type { Post } from '@/types'
 
 const ui = useUIStore()
@@ -129,17 +125,6 @@ const allPosts = ref<Post[]>(getPosts().filter((post) => !post.draft))
 const activeCategory = ref('')
 const currentPage = ref(1)
 
-// 启动时尝试从后端 API 加载文章列表（fallback 到 glob）
-onMounted(async () => {
-  try {
-    const res = await fetchPosts(1, 200)
-    if (res.items.length > 0) {
-      allPosts.value = res.items.map(toFrontendPost)
-    }
-  } catch {
-    // 后端不可用时保持 glob 数据
-  }
-})
 
 // 提取去重分类列表（排除空字符串）
 const categories = computed(() => [
@@ -187,28 +172,6 @@ function tagsOf(post: Post): string[] {
   return post.tags.slice(0, 4)
 }
 
-/** 每篇文章的评论数（从后端批量获取） */
-const commentCounts = ref<Record<string, number>>({})
-
-/** 获取指定文章的评论数 */
-function getCommentCount(slug: string): number {
-  return commentCounts.value[`post:${slug}`] || 0
-}
-
-/** visiblePosts 变化时批量加载评论数 */
-watch(
-  visiblePosts,
-  async (posts) => {
-    if (posts.length === 0) return
-    const keys = posts.map((p) => `post:${p.slug}`)
-    try {
-      commentCounts.value = await fetchBatchCommentCount(keys)
-    } catch {
-      // 后端不可用时静默忽略
-    }
-  },
-  { immediate: true },
-)
 
 function goPrevPage() {
   if (currentPage.value <= 1) return

@@ -34,12 +34,10 @@
       <a
         v-for="item in pagedTreasures"
         :key="item.slug"
-        :href="item.downloadUrl ? resolveUrl(item.downloadUrl) : item.url"
-        :target="item.downloadUrl ? undefined : '_blank'"
-        :rel="item.downloadUrl ? undefined : 'noopener noreferrer'"
-        :download="item.downloadUrl ? '' : undefined"
+        :href="item.downloadUrl || item.url"
+        target="_blank"
+        rel="noopener noreferrer"
         class="treasure-link"
-        @click="handleTreasureClick($event, item)"
       >
         <LiquidGlass
           v-if="ui.liquidGlassEnabled"
@@ -60,19 +58,6 @@
       </a>
     </TransitionGroup>
 
-    <Transition name="download-notice">
-      <div v-if="downloadNotice" class="download-notice" role="status">
-        {{ downloadNotice }}
-      </div>
-    </Transition>
-    <div v-if="downloading" class="download-progress" role="status">
-      <span>下载中 {{ downloadProgress }}%</span>
-      <div class="download-progress-track">
-        <div class="download-progress-bar" :style="{ width: `${downloadProgress}%` }"></div>
-      </div>
-    </div>
-
-    <!-- 空状态 -->
     <div v-if="filteredTreasures.length === 0" class="treasure-empty">
       <p>该分类暂无内容</p>
     </div>
@@ -105,140 +90,37 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import LiquidGlass from '@/components/liquid-glass/LiquidGlass.vue'
 import PanelFallbackGlass from '@/components/panels/PanelFallbackGlass.vue'
 import TreasureCardContent from './TreasureCardContent.vue'
 import { getTreasures, getTreasureCategories } from '@/data/treasures'
-import { fetchTreasures, fetchTreasureCategories } from '@/api/treasures'
 import { siteText } from '@/data/site-text'
-import { resolveUrl } from '@/api/client'
+import type { TreasureCategory } from '@/types'
 import { useUIStore } from '@/stores/ui'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { getToken } from '@/api/client'
-import { downloadWithProgress } from '@/utils/download'
-import type { Treasure, TreasureCategory } from '@/types'
-
 const ui = useUIStore()
-const router = useRouter()
-const auth = useAuthStore()
-
-// 数据（初始 fallback，API 加载后替换）
 const treasures = ref(getTreasures())
 const categories = ref<TreasureCategory[]>(getTreasureCategories())
-
-// 分页配置
 const PAGE_SIZE = 12
 const currentPage = ref(1)
-
-// 当前选中的分类，null 表示全部
 const activeCategory = ref<TreasureCategory | null>(null)
-const downloadNotice = ref('')
-const downloadProgress = ref(0)
-const downloading = ref(false)
-let noticeTimer: number | null = null
 
-// 筛选后的宝物列表（全部）
-const filteredTreasures = computed(() => {
-  if (activeCategory.value === null) return treasures.value
-  return treasures.value.filter((t) => t.category === activeCategory.value)
-})
-
-// 总页数
-const totalPages = computed(() =>
-  Math.max(1, Math.ceil(filteredTreasures.value.length / PAGE_SIZE)),
-)
-
-// 页码列表
-const pageNumbers = computed(() =>
-  Array.from({ length: totalPages.value }, (_, index) => index + 1),
-)
-
-// 当前页显示的数据
-const pagedTreasures = computed(() => {
-  const start = (currentPage.value - 1) * PAGE_SIZE
-  return filteredTreasures.value.slice(start, start + PAGE_SIZE)
-})
+const filteredTreasures = computed(() => activeCategory.value === null ? treasures.value : treasures.value.filter((item) => item.category === activeCategory.value))
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredTreasures.value.length / PAGE_SIZE)))
+const pageNumbers = computed(() => Array.from({ length: totalPages.value }, (_, index) => index + 1))
+const pagedTreasures = computed(() => filteredTreasures.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE))
 
 function goPrevPage() {
-  if (currentPage.value > 1) currentPage.value -= 1
+  if (currentPage.value > 1) currentPage.value--
 }
 
 function goNextPage() {
-  if (currentPage.value < totalPages.value) currentPage.value += 1
+  if (currentPage.value < totalPages.value) currentPage.value++
 }
 
-/** 显示短暂的下载状态提示 */
-function showDownloadNotice(message: string) {
-  downloadNotice.value = message
-  if (noticeTimer) window.clearTimeout(noticeTimer)
-  noticeTimer = window.setTimeout(() => {
-    downloadNotice.value = ''
-    noticeTimer = null
-  }, 3000)
-}
-
-/** 下载卡片不跳外链；本站文件先检查可用性再触发浏览器下载 */
-async function handleTreasureClick(event: MouseEvent, item: Treasure) {
-  if (!item.downloadUrl) return
-
-  if (!auth.initialized) await auth.init()
-  if (!auth.isLoggedIn) {
-    event.preventDefault()
-    await router.push({ path: '/login', query: { redirect: '/treasure' } })
-    return
-  }
-
-  const url = resolveUrl(item.downloadUrl)
-  const isManagedDownload =
-    item.downloadUrl.startsWith('/api/v1/files/') ||
-    item.downloadUrl.startsWith('/api/v1/treasures/')
-  if (!isManagedDownload) return
-
-  event.preventDefault()
-  if (downloading.value) return
-  downloading.value = true
-  downloadProgress.value = 0
-  try {
-    await downloadWithProgress(url, item.title, {
-      headers: { Authorization: `Bearer ${getToken() ?? ''}` },
-      onProgress: (percent) => (downloadProgress.value = percent),
-    })
-    showDownloadNotice('下载已开始')
-  } catch (err: unknown) {
-    showDownloadNotice(err instanceof Error ? err.message : '文件暂时无法下载，请稍后重试')
-  } finally {
-    downloading.value = false
-  }
-}
-
-// 切换分类时重置页码
-watch(activeCategory, () => {
-  currentPage.value = 1
-})
-
-// 如果总页数变小（比如数据减少），保证当前页不越界
-watch(totalPages, (nextTotal) => {
-  if (currentPage.value > nextTotal) currentPage.value = nextTotal
-})
-
-// 尝试从后端 API 加载藏宝数据
-onMounted(async () => {
-  try {
-    const [apiTreasures, apiCategories] = await Promise.all([
-      fetchTreasures(),
-      fetchTreasureCategories(),
-    ])
-    if (apiTreasures.length > 0) {
-      treasures.value = apiTreasures
-    }
-    if (apiCategories.length > 0) {
-      categories.value = apiCategories
-    }
-  } catch {
-    // API 失败，保留本地 fallback 数据
-  }
+watch(activeCategory, () => { currentPage.value = 1 })
+watch(totalPages, (value) => {
+  if (currentPage.value > value) currentPage.value = value
 })
 </script>
 

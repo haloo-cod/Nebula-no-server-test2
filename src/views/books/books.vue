@@ -35,9 +35,9 @@
       <span class="books-sort-label">排序</span>
       <button
         v-for="option in [
-          { value: 'newest' as BookSort, label: '最新上传' },
-          { value: 'oldest' as BookSort, label: '最早上传' },
-          { value: 'custom' as BookSort, label: '自定义排序' },
+          { value: 'newest' as const, label: '最新上传' },
+          { value: 'oldest' as const, label: '最早上传' },
+          { value: 'custom' as const, label: '自定义排序' },
         ]"
         :key="option.value"
         type="button"
@@ -50,143 +50,76 @@
     </div>
 
     <div class="books-grid">
-      <RouterLink
-        v-for="book in books"
-        :key="book.slug"
-        :to="`/books/read/${book.slug}`"
-        class="book-link"
-      >
-        <LiquidGlass
-          v-if="ui.liquidGlassEnabled"
-          :cornerRadius="18"
-          :theme="ui.theme"
-          :blur-radius="ui.liquidGlassBlur"
-          :ripple-trail="true"
-          class="book-glass"
-        >
-          <article class="book-card book-card--liquid">
+      <div v-for="book in visibleBooks" :key="book.slug" class="book-link">
+        <a :href="book.url || undefined" :target="book.url ? '_blank' : undefined" rel="noopener noreferrer">
+          <LiquidGlass v-if="ui.liquidGlassEnabled" :cornerRadius="18" :theme="ui.theme" :blur-radius="ui.liquidGlassBlur" :ripple-trail="true" class="book-glass">
+            <article class="book-card book-card--liquid">
+              <div class="book-cover" :style="getCoverStyle(book)">
+                <span v-if="!book.cover" class="book-cover-placeholder">{{ getPlaceholderLabel(book.title) }}</span>
+              </div>
+              <div class="book-info">
+                <h2 class="book-name">{{ book.title }}</h2>
+                <p class="book-author">{{ book.author || '作者信息待补充' }}</p>
+              </div>
+            </article>
+          </LiquidGlass>
+          <PanelFallbackGlass v-else tag="article" class="book-card book-card-fallback">
             <div class="book-cover" :style="getCoverStyle(book)">
-              <span v-if="!book.cover" class="book-cover-placeholder">{{
-                getPlaceholderLabel(book.title)
-              }}</span>
+              <span v-if="!book.cover" class="book-cover-placeholder">{{ getPlaceholderLabel(book.title) }}</span>
             </div>
             <div class="book-info">
               <h2 class="book-name">{{ book.title }}</h2>
               <p class="book-author">{{ book.author || '作者信息待补充' }}</p>
             </div>
-          </article>
-        </LiquidGlass>
-
-        <PanelFallbackGlass v-else tag="article" class="book-card book-card-fallback">
-          <div class="book-cover" :style="getCoverStyle(book)">
-            <span v-if="!book.cover" class="book-cover-placeholder">{{
-              getPlaceholderLabel(book.title)
-            }}</span>
-          </div>
-          <div class="book-info">
-            <h2 class="book-name">{{ book.title }}</h2>
-            <p class="book-author">{{ book.author || '作者信息待补充' }}</p>
-          </div>
-        </PanelFallbackGlass>
-      </RouterLink>
+          </PanelFallbackGlass>
+        </a>
+      </div>
     </div>
 
     <div v-if="totalPages > 1" class="books-pagination">
-      <el-pagination
-        v-model:current-page="currentPage"
-        :page-size="PAGE_SIZE"
-        :total="totalBooks"
-        :pager-count="5"
-        background
-        layout="prev, pager, next"
-      />
+      <el-pagination v-model:current-page="currentPage" :page-size="PAGE_SIZE" :total="totalBooks" :pager-count="5" background layout="prev, pager, next" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, ref, watch } from 'vue'
 import PanelFallbackGlass from '@/components/panels/PanelFallbackGlass.vue'
 import LiquidGlass from '@/components/liquid-glass/LiquidGlass.vue'
-import { getBooks } from '@/data/books'
-import { fetchBooks, type BookSort } from '@/api/books'
+import rawBooks from '@/content/books.json'
 import { siteText } from '@/data/site-text'
 import { useUIStore } from '@/stores/ui'
 import type { Book } from '@/types'
 
 const ui = useUIStore()
 const PAGE_SIZE = 16
-const books = ref<Book[]>([])
-const totalBooks = ref(0)
+const books = ref<Book[]>(rawBooks as Book[])
 const currentPage = ref(1)
 const searchQuery = ref('')
-const sortMode = ref<BookSort>('newest')
-const loading = ref(false)
+const sortMode = ref<'newest' | 'oldest' | 'custom'>('newest')
 
-// 后端分页：从 API 获取当前页数据
-async function loadBooks() {
-  loading.value = true
-  try {
-    const resp = await fetchBooks(currentPage.value, PAGE_SIZE, searchQuery.value, sortMode.value)
-    books.value = resp.items
-    totalBooks.value = resp.total
-  } catch {
-    // API 失败时 fallback 到本地数据（前端过滤+分页）
-    const allBooks = getBooks()
-    const q = searchQuery.value.trim().toLowerCase()
-    const filtered = q
-      ? allBooks.filter(
-          (b) => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q),
-        )
-      : allBooks
-    if (sortMode.value === 'newest') {
-      filtered.sort((a, b) => b.slug.localeCompare(a.slug))
-    } else if (sortMode.value === 'oldest') {
-      filtered.sort((a, b) => a.slug.localeCompare(b.slug))
-    }
-    totalBooks.value = filtered.length
-    const start = (currentPage.value - 1) * PAGE_SIZE
-    books.value = filtered.slice(start, start + PAGE_SIZE)
-  } finally {
-    loading.value = false
-  }
-}
-
+const filteredBooks = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+  const result = books.value.filter((book) => !query || book.title.toLowerCase().includes(query) || book.author.toLowerCase().includes(query))
+  return [...result].sort((a, b) => sortMode.value === 'oldest' ? a.slug.localeCompare(b.slug) : b.slug.localeCompare(a.slug))
+})
+const totalBooks = computed(() => filteredBooks.value.length)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalBooks.value / PAGE_SIZE)))
+const visibleBooks = computed(() => filteredBooks.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE))
 
 function getCoverStyle(book: Book) {
-  if (!book.cover) return {}
-  return { backgroundImage: `url(${book.cover})` }
+  return book.cover ? { backgroundImage: `url(${book.cover})` } : {}
 }
 
 function getPlaceholderLabel(title: string): string {
   return title.slice(0, 2)
 }
 
-// 页码变化时重新加载
-watch(currentPage, () => {
-  loadBooks()
-})
-
-watch(sortMode, () => {
+watch([searchQuery, sortMode], () => {
   currentPage.value = 1
-  loadBooks()
 })
-
-// 搜索关键词变化时 debounce 300ms 后加载
-let searchTimer: ReturnType<typeof setTimeout> | null = null
-watch(searchQuery, () => {
-  if (searchTimer) clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => {
-    currentPage.value = 1
-    loadBooks()
-  }, 300)
-})
-
-// 首次加载
-onMounted(() => {
-  loadBooks()
+watch(totalPages, (value) => {
+  if (currentPage.value > value) currentPage.value = value
 })
 </script>
 

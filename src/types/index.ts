@@ -48,16 +48,15 @@ export interface GalleryProject {
   content: string // Markdown 正文原文(渲染时才转 HTML)
 }
 
-/** 图书元数据(列表与阅读器共用,EPUB 元数据可按需补全) */
+/** 静态书单条目，可选外部详情链接，不包含 EPUB 文件。 */
 export interface Book {
-  slug: string // URL 标识,由 EPUB 文件名或后端标识生成
-  title: string // 书名,缺省时可由 EPUB 元数据补全
-  author: string // 作者,缺省时可由 EPUB 元数据补全
-  description: string // 简介或阅读备注,可能为空串
-  cover: string // 封面图 URL,可能为空串;为空时使用占位封面
-  file: string // EPUB 文件访问地址,测试阶段指向 public/books,后续可换后端 URL
+  slug: string
+  title: string
+  author: string
+  description: string
+  cover: string
+  url?: string
 }
-
 /** 相册中的单张照片 */
 export interface AlbumPhoto {
   url: string // 照片 URL,当前来自本地 assets,后续可换后端图床
@@ -75,13 +74,6 @@ export interface Album {
   photos: AlbumPhoto[] // 全部照片;堆叠的中/底层取 photos[1]/photos[2],不足时条件渲染
 }
 
-/** 从 EPUB 内部自动解析出的图书元数据 */
-export interface ExtractedBookMeta {
-  title?: string // EPUB metadata.title
-  author?: string // EPUB metadata.creator
-  description?: string // EPUB metadata.description
-  cover?: string // EPUB 内封面解析出的 blob URL
-}
 
 /** 友链条目(友链页鱼缸与列表共用) */
 export interface Friend {
@@ -134,38 +126,34 @@ export interface HolidayApiResponse {
 // 说说(Moments)
 // ---------------------------------------------------------------------------
 
-/** 一条说说/碎碎念 */
+/** 一条说说/碎碎念。 */
 export interface Moment {
   id: number
-  date: string // ISO 日期时间,如 '2026-07-10T13:37:15'
-  content: string // 纯文本正文
-  mood?: string // 心情标签,如 '开心'、'疲惫'、'灵感'
-  moodText?: string // 用户手动填写的心情文字
+  date: string
+  content: string
+  mood?: string
+  moodText?: string
   tags: string[]
-  images: string[] // 图片 URL 列表
-  likes: number // 点赞数
-  commentCount?: number // 评论数（从 API 获取时填充）
+  images: string[]
+  likes: number
+  commentCount?: number
 }
 
-/** 说说评论(一层平铺,暂不支持嵌套回复) */
+/** 说说评论，静态模式下仅作为外部评论服务适配类型。 */
 export interface MomentComment {
   id: number
-  momentId: number // 所属说说 ID
-  nickname: string // 评论者昵称
-  avatar?: string // 评论者头像 URL
-  content: string // 评论正文
-  date: string // ISO 日期时间
-  likes: number // 评论点赞数
+  momentId: number
+  nickname: string
+  avatar?: string
+  content: string
+  date: string
+  likes: number
 }
-
-/** getMoments 分页返回结构 */
+/** 分页后的静态说说结果。 */
 export interface MomentPage {
   items: Moment[]
   total: number
 }
-
-// ---------------------------------------------------------------------------
-// 藏宝阁（Treasure）
 // ---------------------------------------------------------------------------
 
 /** 藏宝阁分类（未来可由后端动态提供） */

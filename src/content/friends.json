@@ -1,0 +1,12 @@
+{
+  "items": [],
+  "exchange": {
+    "enabled": true,
+    "name": "你的站点名称",
+    "url": "https://example.com",
+    "avatar": "/assets/images/avatar.jpg",
+    "bio": "这里填写你的站点简介。",
+    "requirements": ["原创内容优先", "站点稳定可访问"],
+    "contact": "your-email@example.com"
+  }
+}

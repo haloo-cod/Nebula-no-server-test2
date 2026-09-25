@@ -10,7 +10,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 // Vite 构建配置
 export default defineConfig({
   // History 路由部署在域名根路径，使用绝对资源地址，避免深层 URL 刷新时相对路径错位。
-  base: '/',
+  base: '/Nebula-no-server-test2/',
   // 局域网开发预览时可恢复下面配置（生产部署不需要）：
   // server: {
   //   host: true,

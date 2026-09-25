@@ -33,7 +33,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import type { Moment } from '@/types'
-import { likeMoment } from '@/api/moments'
 
 const props = defineProps<{
   moment: Moment
@@ -91,8 +90,6 @@ function toggleLike() {
     setTimeout(() => {
       justLiked.value = false
     }, 400)
-    // 调用后端 API 点赞（静默，不阻塞 UI）
-    likeMoment(props.moment.id).catch(() => {})
   }
   saveLikedIds(ids)
 }

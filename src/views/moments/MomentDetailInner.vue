@@ -34,94 +34,22 @@
       </button>
     </div>
 
-    <!-- 评论区 -->
     <div class="detail-inner__comments">
-      <h4 class="detail-inner__comments-title">评论 ({{ comments.length }})</h4>
-      <div v-if="commentsLoading" class="detail-inner__comments-empty">正在加载评论...</div>
-      <div v-else-if="comments.length === 0" class="detail-inner__comments-empty">
-        {{ commentsError || '暂无评论，来留下第一条吧' }}
-      </div>
-      <div v-else class="detail-inner__comments-list">
-        <div v-for="c in comments" :key="c.id" class="detail-inner__comment-item">
-          <span class="detail-inner__comment-nick">{{ c.nickname }}</span>
-          <span class="detail-inner__comment-date">{{ c.date }}</span>
-          <p class="detail-inner__comment-text">{{ c.content }}</p>
-        </div>
-      </div>
-      <div v-if="!auth.isLoggedIn" class="detail-inner__comment-login">
-        <span>登录后参与评论</span>
-        <RouterLink :to="loginLocation">登录</RouterLink>
-        <RouterLink :to="registerLocation">注册</RouterLink>
-      </div>
-      <form v-else class="detail-inner__comment-form" @submit.prevent="submitComment">
-        <div class="detail-inner__comment-author">
-          以 {{ auth.user?.display_name || auth.user?.username || '当前账户' }} 的身份评论
-        </div>
-        <textarea
-          v-model="commentText"
-          class="detail-inner__comment-input detail-inner__comment-textarea"
-          maxlength="500"
-          rows="3"
-          placeholder="写下你的想法..."
-        ></textarea>
-        <div class="detail-inner__comment-form-footer">
-          <span class="detail-inner__comment-hint">已登录账户可发表评论</span>
-          <button
-            class="detail-inner__comment-submit"
-            type="submit"
-            :disabled="submitting || !commentText.trim()"
-          >
-            {{ submitting ? '发送中...' : '发表评论' }}
-          </button>
-        </div>
-      </form>
+      <h4 class="detail-inner__comments-title">评论</h4>
+      <div class="detail-inner__comments-empty">静态模板未启用评论服务</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
-import type { Moment, MomentComment } from '@/types'
+import type { Moment } from '@/types'
 import ImageGrid from './ImageGrid.vue'
-import { likeMoment, fetchMomentComments, postMomentComment } from '@/api/moments'
-import { useAuthStore } from '@/stores/auth'
 
-const props = defineProps<{
-  moment: Moment
-}>()
-
-const route = useRoute()
-const auth = useAuthStore()
-const loginLocation = computed(() => ({ path: '/login', query: { redirect: route.fullPath } }))
-const registerLocation = computed(() => ({
-  path: '/register',
-  query: { redirect: route.fullPath },
-}))
-
-// ============ 评论列表 ============
-
-const comments = ref<MomentComment[]>([])
-const commentText = ref('')
-const commentsLoading = ref(false)
-const commentsError = ref('')
-const submitting = ref(false)
-
-onMounted(async () => {
-  isLiked.value = getLikedIds().has(props.moment.id)
-  // 从 API 加载评论
-  commentsLoading.value = true
-  commentsError.value = ''
-  try {
-    comments.value = await fetchMomentComments(props.moment.id)
-  } catch {
-    commentsError.value = '评论暂时无法加载'
-  } finally {
-    commentsLoading.value = false
-  }
-})
-// ============ 点赞逻辑(与 MomentCard 共享 localStorage key) ============
-
+const props = defineProps<{ moment: Moment }>()
+const isLiked = ref(false)
+const localLikeDelta = ref(0)
+const justLiked = ref(false)
 const LIKED_KEY = 'moments_liked_ids'
 
 function getLikedIds(): Set<number> {
@@ -132,16 +60,6 @@ function getLikedIds(): Set<number> {
     return new Set()
   }
 }
-
-function saveLikedIds(ids: Set<number>) {
-  localStorage.setItem(LIKED_KEY, JSON.stringify([...ids]))
-}
-
-const isLiked = ref(false)
-const localLikeDelta = ref(0)
-const justLiked = ref(false)
-
-const displayLikes = computed(() => props.moment.likes + localLikeDelta.value)
 
 function toggleLike() {
   const ids = getLikedIds()
@@ -154,41 +72,21 @@ function toggleLike() {
     localLikeDelta.value++
     isLiked.value = true
     justLiked.value = true
-    setTimeout(() => {
-      justLiked.value = false
-    }, 400)
-    // 调用后端 API 点赞（静默）
-    likeMoment(props.moment.id).catch(() => {})
+    window.setTimeout(() => { justLiked.value = false }, 400)
   }
-  saveLikedIds(ids)
+  localStorage.setItem(LIKED_KEY, JSON.stringify([...ids]))
 }
 
-/** 提交说说评论，成功后插入当前列表顶部。 */
-async function submitComment() {
-  const text = commentText.value.trim()
-  if (!auth.isLoggedIn || !text || submitting.value) return
+const displayLikes = computed(() => props.moment.likes + localLikeDelta.value)
 
-  submitting.value = true
-  try {
-    const comment = await postMomentComment(props.moment.id, text)
-    comments.value = [comment, ...comments.value]
-    commentText.value = ''
-  } catch (err: unknown) {
-    commentsError.value = err instanceof Error ? err.message : '评论发送失败，请稍后重试'
-  } finally {
-    submitting.value = false
-  }
-}
-
-// ============ 工具函数 ============
-
-/** 完整日期格式(详情面板用) */
 function fullDate(dateStr: string): string {
-  const d = new Date(dateStr)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+  const date = new Date(dateStr)
+  return Number.isNaN(date.getTime()) ? dateStr : date.toLocaleString('zh-CN')
 }
 
+onMounted(() => {
+  isLiked.value = getLikedIds().has(props.moment.id)
+})
 </script>
 
 <style scoped>

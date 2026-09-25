@@ -120,32 +120,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import AlbumCard from './AlbumCard.vue'
-import { fetchAlbums, fetchAlbumDetail } from '@/api/albums'
+import { getAlbums, getAlbum } from '@/data/albums'
 import { siteText } from '@/data/site-text'
 import type { Album } from '@/types'
 
-const albums = ref<Album[]>([])
+const albums = ref<Album[]>(getAlbums())
 
 // ============ 相册详情状态(页内切换,不进路由) ============
 
 const currentAlbum = ref<Album | null>(null)
 
-async function openAlbum(album: Album) {
-  currentAlbum.value = album
+function openAlbum(album: Album) {
+  currentAlbum.value = getAlbum(album.id) ?? album
   window.scrollTo({ top: 0 })
-
-  // 尝试从 API 获取完整照片列表（列表接口 photos 为空）
-  try {
-    const detail = await fetchAlbumDetail(Number(album.id))
-    if (detail.photos.length > 0) {
-      currentAlbum.value = detail
-    }
-  } catch {
-    // API 失败时保持当前数据
-  }
 }
 
 function closeAlbum() {
@@ -192,17 +182,6 @@ function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'ArrowRight') nextPhoto()
 }
 
-onMounted(async () => {
-  document.addEventListener('keydown', handleKeydown)
-
-  // 尝试从后端 API 获取相册列表
-  try {
-    const apiAlbums = await fetchAlbums()
-    albums.value = apiAlbums
-  } catch {
-    // API 失败时保持空状态
-  }
-})
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)

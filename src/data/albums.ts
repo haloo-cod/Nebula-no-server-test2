@@ -1,8 +1,41 @@
+import rawAlbums from '@/content/albums.json'
 import type { Album } from '@/types'
 
-/** 相册数据已由后端 API 提供，保留空 getter 兼容旧调用。 */
-const albums: Album[] = []
+interface StaticAlbumPhoto {
+  url: string
+  caption?: string
+}
 
+interface StaticAlbum {
+  id?: string
+  slug?: string
+  title: string
+  description?: string
+  cover?: string
+  date?: string
+  orientation?: 'landscape' | 'portrait'
+  photos?: StaticAlbumPhoto[]
+}
+
+const albums: Album[] = (rawAlbums as StaticAlbum[]).map((album, index) => {
+  const photos = album.photos ?? []
+  return {
+    id: album.id ?? album.slug ?? `album-${index + 1}`,
+    title: album.title,
+    description: album.description ?? '',
+    cover: album.cover ?? photos[0]?.url ?? '',
+    date: album.date ?? '',
+    orientation: album.orientation ?? 'landscape',
+    photos,
+  }
+})
+
+/** 获取 GitHub 内容目录中的全部相册。 */
 export function getAlbums(): Album[] {
   return albums
+}
+
+/** 按标识获取单个相册。 */
+export function getAlbum(id: string): Album | null {
+  return albums.find((album) => album.id === id) ?? null
 }
