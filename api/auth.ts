@@ -20,9 +20,11 @@ export default async function handler(request: VercelRequest, response: VercelRe
   try {
     const { clientId, clientSecret, baseUrl } = getConfig()
     const code = typeof request.query.code === 'string' ? request.query.code : ''
-    const hasCode = code.length > 0
-    const action = hasCode ? 'callback' : 'authorize'
-    const callbackUrl = `${baseUrl}/api/auth`
+    const action = code.length > 0 ? 'callback' : 'authorize'
+    const forwardedHost = request.headers['x-forwarded-host']
+    const requestHost = Array.isArray(forwardedHost) ? forwardedHost[0] : forwardedHost || request.headers.host
+    const callbackBaseUrl = requestHost ? `https://${requestHost}` : baseUrl
+    const callbackUrl = `${callbackBaseUrl}/api/auth`
     if (action === 'authorize') {
       const provider = typeof request.query.provider === 'string' ? request.query.provider : 'github'
       if (provider !== 'github') return response.status(400).send('Invalid provider')
