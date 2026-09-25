@@ -11,7 +11,9 @@ function getConfig() {
 
 function callbackPage(status: 'success' | 'error', payload: unknown): string {
   const message = JSON.stringify(`authorization:github:${status}:${JSON.stringify(payload)}`)
-  return `<!doctype html><html><body><script>window.opener.postMessage(${message}, '*');</script><p>Authorization complete. You can close this window.</p></body></html>`
+  const title = status === 'success' ? 'Authorization complete. You can close this window.' : 'Authorization failed. You can close this window.'
+  const detail = status === 'error' && payload && typeof payload === 'object' && 'error' in payload ? String(payload.error) : ''
+  return `<!doctype html><html><body><script>window.opener?.postMessage(${message}, '*');</script><p>${title}</p><p>${detail}</p></body></html>`
 }
 
 export default async function handler(request: VercelRequest, response: VercelResponse) {
@@ -32,15 +34,16 @@ export default async function handler(request: VercelRequest, response: VercelRe
       return response.redirect(`https://github.com/login/oauth/authorize?${params.toString()}`)
     }
 
-    const code = typeof request.query.code === 'string' ? request.query.code : ''
-    if (!code) return response.status(400).send(callbackPage('error', { error: 'Missing code' }))
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code, redirect_uri: callbackUrl }),
+      headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret, code, redirect_uri: callbackUrl }).toString(),
     })
-    const token = (await tokenResponse.json()) as { access_token?: string; error?: string }
-    if (!token.access_token) return response.status(502).send(callbackPage('error', { error: token.error || 'OAuth token exchange failed' }))
+    const token = (await tokenResponse.json()) as { access_token?: string; error?: string; error_description?: string }
+    if (!tokenResponse.ok || !token.access_token) {
+      const reason = token.error_description || token.error || `GitHub token exchange failed (${tokenResponse.status})`
+      return response.status(502).setHeader('Content-Type', 'text/html').send(callbackPage('error', { error: reason }))
+    }
     return response.status(200).setHeader('Content-Type', 'text/html').send(callbackPage('success', { token: token.access_token }))
   } catch (error) {
     return response.status(500).send(callbackPage('error', { error: error instanceof Error ? error.message : 'OAuth configuration error' }))

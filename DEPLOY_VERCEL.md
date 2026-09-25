@@ -49,7 +49,7 @@ Homepage URL:
 https://nebula-no-server-test2.vercel.app
 
 Authorization callback URL:
-https://nebula-no-server-test2.vercel.app/api/auth?action=callback
+https://nebula-no-server-test2.vercel.app/api/auth
 ```
 
 ## 4. CMS 配置
