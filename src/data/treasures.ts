@@ -1,7 +1,11 @@
 import rawTreasures from '@/content/treasures.json'
 import type { Treasure, TreasureCategory } from '@/types'
 
-const treasures = rawTreasures as Treasure[]
+interface TreasuresContent {
+  items: Treasure[]
+}
+
+const treasures = (rawTreasures as TreasuresContent).items
 
 /** 获取 GitHub 内容目录中的全部藏宝条目。 */
 export function getTreasures(): Treasure[] {

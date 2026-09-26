@@ -36,7 +36,11 @@ interface CarouselEntry {
   alt?: string
 }
 
-const entries = rawSlides as Array<string | CarouselEntry>
+interface CarouselContent {
+  items: Array<string | CarouselEntry>
+}
+
+const entries = (rawSlides as CarouselContent).items
 const images = ref(entries.map((entry) => (typeof entry === 'string' ? entry : entry.src)))
 const currentIndex = ref(0)
 const autoPlayTimer = ref<number | null>(null)

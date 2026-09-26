@@ -55,12 +55,22 @@ collections:
             widget: list
             required: false
             fields:
-              - { name: id, label: 标识, widget: string }
+              - { name: id, label: 标识, widget: string, required: false }
               - { name: date, label: 日期, widget: datetime }
               - { name: content, label: 内容, widget: text }
               - { name: mood, label: 心情, widget: string, required: false }
-              - { name: tags, label: 标签, widget: list, required: false }
-              - { name: images, label: 图片, widget: list, required: false, field: { name: url, widget: image } }
+              - { name: moodText, label: 心情描述, widget: string, required: false }
+              - name: tags
+                label: 标签
+                widget: list
+                required: false
+                field: { name: tag, label: 标签, widget: string }
+              - name: images
+                label: 图片
+                widget: list
+                required: false
+                field: { name: image, label: 图片, widget: image }
+              - { name: likes, label: 点赞数, widget: number, required: false }
 
   - name: site-data
     label: 站点数据
@@ -72,11 +82,27 @@ collections:
           - name: items
             label: 友链
             widget: list
+            required: false
             fields:
               - { name: name, label: 名称, widget: string }
               - { name: bio, label: 简介, widget: string }
               - { name: avatar, label: 头像, widget: image }
               - { name: url, label: 地址, widget: string }
+          - name: exchange
+            label: 友链交换信息
+            widget: object
+            fields:
+              - { name: enabled, label: 启用申请, widget: boolean, required: false }
+              - { name: name, label: 站点名称, widget: string, required: false }
+              - { name: url, label: 站点地址, widget: string, required: false }
+              - { name: avatar, label: 头像, widget: string, required: false }
+              - { name: bio, label: 简介, widget: text, required: false }
+              - name: requirements
+                label: 申请要求
+                widget: list
+                required: false
+                field: { name: requirement, label: 要求, widget: string }
+              - { name: contact, label: 联系方式, widget: string, required: false }
       - name: profile
         label: 个人资料
         file: src/content/profile.json
@@ -97,8 +123,50 @@ collections:
         label: 背景
         file: src/content/backgrounds.json
         fields:
-          - { name: dark, label: 暗色背景, widget: object }
-          - { name: light, label: 亮色背景, widget: object }
+          - name: dark
+            label: 暗色背景
+            widget: object
+            fields:
+              - name: desktop
+                label: 桌面端背景
+                widget: list
+                required: false
+                fields:
+                  - { name: src, label: 图片或视频地址, widget: string }
+                  - { name: mediaType, label: 媒体类型, widget: select, options: [image, video], default: image, required: false }
+                  - { name: posterUrl, label: 视频封面, widget: string, required: false }
+                  - { name: mimeType, label: MIME 类型, widget: string, required: false }
+              - name: mobile
+                label: 移动端背景
+                widget: list
+                required: false
+                fields:
+                  - { name: src, label: 图片或视频地址, widget: string }
+                  - { name: mediaType, label: 媒体类型, widget: select, options: [image, video], default: image, required: false }
+                  - { name: posterUrl, label: 视频封面, widget: string, required: false }
+                  - { name: mimeType, label: MIME 类型, widget: string, required: false }
+          - name: light
+            label: 亮色背景
+            widget: object
+            fields:
+              - name: desktop
+                label: 桌面端背景
+                widget: list
+                required: false
+                fields:
+                  - { name: src, label: 图片或视频地址, widget: string }
+                  - { name: mediaType, label: 媒体类型, widget: select, options: [image, video], default: image, required: false }
+                  - { name: posterUrl, label: 视频封面, widget: string, required: false }
+                  - { name: mimeType, label: MIME 类型, widget: string, required: false }
+              - name: mobile
+                label: 移动端背景
+                widget: list
+                required: false
+                fields:
+                  - { name: src, label: 图片或视频地址, widget: string }
+                  - { name: mediaType, label: 媒体类型, widget: select, options: [image, video], default: image, required: false }
+                  - { name: posterUrl, label: 视频封面, widget: string, required: false }
+                  - { name: mimeType, label: MIME 类型, widget: string, required: false }
       - name: carousel
         label: 首页轮播
         file: src/content/carousel.json
@@ -125,4 +193,37 @@ collections:
               - { name: category, label: 分类, widget: string }
               - { name: icon, label: 图标, widget: string }
               - { name: url, label: 地址, widget: string }
-              - { name: tags, label: 标签, widget: list, required: false }
+              - name: tags
+                label: 标签
+                widget: list
+                required: false
+                field: { name: tag, label: 标签, widget: string }
+
+      - name: albums
+        label: 相册
+        file: src/content/albums.json
+        fields:
+          - name: items
+            label: 相册列表
+            widget: list
+            required: false
+            fields:
+              - { name: id, label: 标识, widget: string, required: false }
+              - { name: title, label: 标题, widget: string }
+              - { name: description, label: 简介, widget: text, required: false }
+              - { name: cover, label: 封面, widget: image, required: false }
+              - { name: date, label: 日期, widget: string, required: false }
+              - { name: orientation, label: 排列方向, widget: select, options: [landscape, portrait], default: landscape }
+              - name: photos
+                label: 照片
+                widget: list
+                required: false
+                fields:
+                  - { name: url, label: 图片, widget: image }
+                  - { name: caption, label: 图片说明, widget: string, required: false }
+
+      - name: about
+        label: 关于页内容
+        file: src/content/about.md
+        fields:
+          - { name: body, label: 正文, widget: markdown }
