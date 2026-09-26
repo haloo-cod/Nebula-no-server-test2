@@ -1,6 +1,8 @@
-[
-  {
-    "src": "/assets/images/carousel.webp",
-    "alt": "默认轮播图"
-  }
-]
+{
+  "items": [
+    {
+      "src": "/assets/images/carousel.webp",
+      "alt": "默认轮播图"
+    }
+  ]
+}

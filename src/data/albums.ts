@@ -17,7 +17,11 @@ interface StaticAlbum {
   photos?: StaticAlbumPhoto[]
 }
 
-const albums: Album[] = (rawAlbums as StaticAlbum[]).map((album, index) => {
+interface AlbumsContent {
+  items: StaticAlbum[]
+}
+
+const albums: Album[] = (rawAlbums as AlbumsContent).items.map((album, index) => {
   const photos = album.photos ?? []
   return {
     id: album.id ?? album.slug ?? `album-${index + 1}`,

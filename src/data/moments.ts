@@ -12,7 +12,11 @@ interface StaticMoment {
   likes?: number
 }
 
-const moments: Moment[] = (rawMoments as StaticMoment[])
+interface MomentsContent {
+  items: StaticMoment[]
+}
+const momentsContent = rawMoments as MomentsContent
+const moments: Moment[] = momentsContent.items
   .map((moment, index) => ({
     id: typeof moment.id === 'number' ? moment.id : index + 1,
     date: moment.date,
