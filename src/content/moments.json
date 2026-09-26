@@ -6,8 +6,13 @@
       "content": "把部署和 CMS 配置过程整理成了两篇指南，也顺手补上了后台的数据结构。把踩过的坑写下来，下一次部署就能少绕一点路。",
       "mood": "开心",
       "moodText": "把问题解决并记录下来",
-      "tags": ["博客折腾", "部署记录"],
-      "images": [],
+      "tags": [
+        "博客折腾",
+        "部署记录"
+      ],
+      "images": [
+        "/assets/images/dark-desktop.webp"
+      ],
       "likes": 0
     }
   ]
