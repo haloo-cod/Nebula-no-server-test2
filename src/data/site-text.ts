@@ -23,5 +23,6 @@ export const siteText: Record<string, PageText> = {
   treasure: { kicker: 'Treasure', title: '藏宝阁', subtitle: '收集有趣的开源项目和实用工具，也会提供一些资源链接。' },
   books: { kicker: 'Library', title: '书单', subtitle: '记录阅读和收藏的书籍，不提供 EPUB 在线阅读。' },
   gallery: { kicker: 'Projects', title: '项目', subtitle: '记录下自己做的一些项目' },
+  moments: { kicker: 'Moments', title: '说说', subtitle: '记录生活中的片刻、心情与想法。' },
   blog: { kicker: 'Blog', title: '博文', subtitle: '记录下自己的一些想法和生活' },
 }
