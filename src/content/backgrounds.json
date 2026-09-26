@@ -1,10 +1,30 @@
 {
   "dark": {
-    "desktop": [{ "src": "/assets/images/dark-desktop.webp", "mediaType": "image" }],
-    "mobile": []
+    "desktop": [
+      {
+        "src": "/assets/images/dark-desktop.webp",
+        "mediaType": "image"
+      }
+    ],
+    "mobile": [
+      {
+        "mediaType": "image",
+        "src": "/assets/images/carousel.webp"
+      }
+    ]
   },
   "light": {
-    "desktop": [{ "src": "/assets/images/light-desktop-01.webp", "mediaType": "image" }],
-    "mobile": []
+    "desktop": [
+      {
+        "src": "/assets/images/light-desktop-01.webp",
+        "mediaType": "image"
+      }
+    ],
+    "mobile": [
+      {
+        "mediaType": "image",
+        "src": "/assets/images/carousel.webp"
+      }
+    ]
   }
 }
