@@ -1,3 +1,13 @@
 {
-  "items": []
+  "items": [
+    {
+      "slug": "vite",
+      "title": "Vite",
+      "description": "新一代前端构建工具，提供快速的开发服务器、模块热更新和面向生产环境的打包能力。本博客基于 Vite 构建。",
+      "category": "开源项目",
+      "icon": "⚡",
+      "url": "https://github.com/vitejs/vite",
+      "tags": ["前端", "构建工具", "JavaScript"]
+    }
+  ]
 }
