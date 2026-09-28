@@ -1,10 +1,35 @@
 {
-  "items": [],
+  "items": [
+    {
+      "name": "Vue.js",
+      "bio": "渐进式 JavaScript 框架，用于构建用户界面。",
+      "avatar": "https://vuejs.org/logo.svg",
+      "url": "https://vuejs.org/"
+    },
+    {
+      "name": "Vite",
+      "bio": "面向现代 Web 的快速开发与构建工具。",
+      "avatar": "https://vite.dev/logo.svg",
+      "url": "https://vite.dev/"
+    },
+    {
+      "name": "TypeScript",
+      "bio": "为 JavaScript 添加静态类型检查。",
+      "avatar": "https://www.typescriptlang.org/favicon-32x32.png",
+      "url": "https://www.typescriptlang.org/"
+    },
+    {
+      "name": "Node.js",
+      "bio": "JavaScript 运行时与开发文档。",
+      "avatar": "https://nodejs.org/static/images/favicons/favicon.png",
+      "url": "https://nodejs.org/"
+    }
+  ],
   "exchange": {
     "enabled": true,
-    "name": "你的站点名称",
-    "url": "https://example.com",
-    "avatar": "/assets/images/avatar.jpg",
+    "name": "Starlit",
+    "url": "https://starlitn.top/",
+    "avatar": "https://r2.starlitn.top/images/2026/08/37e62a98367c_head_portrait.jpg",
     "bio": "这里填写你的站点简介。",
     "requirements": ["原创内容优先", "站点稳定可访问"],
     "contact": "your-email@example.com"

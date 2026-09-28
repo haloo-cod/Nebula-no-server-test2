@@ -75,6 +75,11 @@ collections:
   - name: site-data
     label: 站点数据
     files:
+      - name: site
+        label: 站点设置
+        file: src/content/site.json
+        fields:
+          - { name: siteName, label: 站点名称, widget: string }
       - name: friends
         label: 友链
         file: src/content/friends.json

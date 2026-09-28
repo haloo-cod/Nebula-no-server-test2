@@ -1,6 +1,6 @@
 ﻿<template>
   <div class="home-root" :class="{ 'home-locked': !showUIElements }">
-    <!-- 面板区域（简介 + 占位） -->
+    <!-- 面板区域（简介 + 天气） -->
     <div v-if="showUIElements" class="home-panels">
       <div class="home-panels-inner">
         <div class="left-panel-glass">
@@ -39,10 +39,10 @@
             :ripple-trail="true"
             class="panel-liquid-glass"
           >
-            <div class="home-panel-placeholder" aria-label="内容面板占位"></div>
+            <WeatherPanel />
           </LiquidGlass>
           <PanelFallbackGlass v-else static-blur>
-            <div class="home-panel-placeholder" aria-label="内容面板占位"></div>
+            <WeatherPanel />
           </PanelFallbackGlass>
         </div>
       </div>
@@ -153,6 +153,7 @@
 import { ref, watch, computed, onUnmounted } from 'vue'
 import PanelFallbackGlass from '@/components/panels/PanelFallbackGlass.vue'
 import HomeProfilePanel from '@/components/panels/HomeProfilePanel.vue'
+import WeatherPanel from '@/components/panels/WeatherPanel.vue'
 import CalendarPanel from '@/components/panels/CalendarPanel.vue'
 import DigitalClockPanel from '@/components/panels/DigitalClockPanel.vue'
 import Carousel from '@/components/panels/Carousel.vue'
@@ -161,6 +162,7 @@ import MomentCarousel from '@/components/panels/MomentCarousel.vue'
 import LiquidGlass from '@/components/liquid-glass/LiquidGlass.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
 import { useUIStore } from '@/stores/ui'
+import { siteName } from '@/data/site-config'
 import {
   avatar as fallbackAvatar,
   profile as fallbackProfile,
@@ -175,7 +177,7 @@ const profileAvatar = ref(fallbackAvatar)
 const profileName = ref(fallbackProfile.name)
 const profileBio = ref(fallbackProfile.bio)
 const profileLinks = ref<SocialLink[]>(fallbackLinks)
-const fullTitle = "Starlitn'blog"
+const fullTitle = siteName
 const isMobile = ref(window.innerWidth < 768)
 const showContentDirectly = history.state?.showContent === true
 const skipLiquidGlassReveal = history.state?.skipLiquidGlassReveal === true
@@ -548,8 +550,5 @@ const containerClass = computed(() => {
   .bottom-right-bottom-inner > * {
     min-height: 280px;
   }
-}
-.home-panel-placeholder {
-  min-height: 23rem;
 }
 </style>

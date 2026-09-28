@@ -2,7 +2,7 @@
   <header class="liquid-glass-nav">
     <!-- 左侧：Logo + 翻译按钮 + 移动端主题切换 -->
     <div class="nav-left">
-      <span class="logo">Starlitn'blog</span>
+      <span class="logo">{{ siteName }}</span>
       <div ref="translateRef" class="translate-wrap" translate="no">
         <button class="translate-btn" @click.stop="langOpen = !langOpen">
           <SvgIcon name="international" class="translate-icon" />
@@ -281,6 +281,7 @@ import { getCurrentLang, setLang, getLangLabel } from '@/i18n'
 import SvgIcon from '@/components/SvgIcon.vue'
 import BackgroundPicker from '@/components/BackgroundPicker.vue'
 import { useUIStore } from '@/stores/ui'
+import { siteName } from '@/data/site-config'
 
 const ui = useUIStore()
 const currentLang = ref(getCurrentLang())

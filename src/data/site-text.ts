@@ -4,6 +4,8 @@
  * 后续可对接后端 SiteConfig API，管理员后台修改后优先使用 API 值。
  */
 
+import { siteName } from '@/data/site-config'
+
 /** 单个页面的文案结构 */
 export interface PageText {
   kicker: string // 英文小标题（如 "Images"）
@@ -13,9 +15,9 @@ export interface PageText {
 
 /** 全站页面文案配置，同时作为静态站点的页面 SEO 默认来源。 */
 export const siteText: Record<string, PageText> = {
-  index: { kicker: 'Home', title: "Starlitn'blog", subtitle: '分享技术、生活和思考的个人博客' },
-  archive: { kicker: 'Archive', title: '归档', subtitle: "按时间浏览 Starlitn'blog 的文章归档" },
-  about: { kicker: 'About', title: '关于', subtitle: "关于 Starlitn'blog 和站点作者" },
+  index: { kicker: 'Home', title: siteName, subtitle: '分享技术、生活和思考的个人博客' },
+  archive: { kicker: 'Archive', title: '归档', subtitle: `按时间浏览 ${siteName} 的文章归档` },
+  about: { kicker: 'About', title: '关于', subtitle: `关于 ${siteName} 和站点作者` },
   studyRoom: { kicker: 'Study Room', title: '自习室', subtitle: '专注当下，记录每一次努力。' },
   midnightTavern: { kicker: 'Midnight Tavern', title: '深夜酒馆', subtitle: '把想说的话留在深夜里。' },
   images: { kicker: 'Images', title: '图片', subtitle: '分享好看的图片' },

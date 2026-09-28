@@ -1,6 +1,6 @@
 # Starlit Blog Template
 
-Vue 3 + Vite 静态博客模板。内容使用 GitHub 仓库中的 Markdown 和 JSON 管理，图片和视频既可以提交到 GitHub，也可以填写 R2、CDN 等完整外链。
+Vue 3 + Vite 静态博客模板，是 [Nebula](https://github.com/haloo-cod/Nebula) 的无服务器版本。内容使用 GitHub 仓库中的 Markdown 和 JSON 管理，图片和视频既可以提交到 GitHub，也可以填写 R2、CDN 等完整外链。
 
 ## 特性
 
@@ -11,7 +11,8 @@ Vue 3 + Vite 静态博客模板。内容使用 GitHub 仓库中的 Markdown 和 
 - WebGL 液态玻璃效果，CSS 毛玻璃 fallback
 - 本地分页、文章归档、Markdown 代码高亮
 - 自习室数据使用 localStorage
-- 不依赖 Python、FastAPI、SQLite、JWT 或运行时后端
+- 可部署到 Vercel 等静态托管平台，不依赖运行时后端
+- 不依赖 Python、FastAPI、SQLite、JWT
 - 已移除 EPUB 阅读器和所有后端服务
 
 ## 仓库目录结构
@@ -28,7 +29,7 @@ Nebula-no-server-test2/
 └── README.md
 ```
 
-推荐部署：Netlify。详细步骤见 `DEPLOY_NETLIFY.md`；它可以为 Decap CMS 提供 GitHub OAuth，不需要单独部署 Worker。
+支持部署到 Vercel。也可使用 Netlify；详细步骤见 `DEPLOY_NETLIFY.md`，Netlify 可为 Decap CMS 提供 GitHub OAuth，不需要单独部署 Worker。
 
 内容目录位于 `src/content/`：
 
@@ -40,6 +41,7 @@ src/content/
 ├── albums.json
 ├── friends.json
 ├── profile.json
+├── site.json
 ├── backgrounds.json
 ├── carousel.json
 ├── treasures.json
@@ -118,17 +120,7 @@ pnpm format
 public/admin/config.yml
 ```
 
-访问：
-
-```text
-/admin/
-```
-
-首次使用前修改：
-
-```text
-public/admin/config.yml
-```
+站点名称保存在 `src/content/site.json`，在后台的“站点数据 → 站点设置”中编辑。它会同步用于导航 Logo、首页打字标题和浏览器页面标题；`config.yml` 负责定义后台字段，实际配置值保存在 JSON 文件中。
 
 需要替换：
 
