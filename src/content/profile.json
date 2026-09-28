@@ -3,5 +3,11 @@
   "bio": "分享技术、生活和思考的个人博客",
   "avatar": "https://r2.starlitn.top/images/2026/08/37e62a98367c_head_portrait.jpg",
   "cover": "",
-  "socialLinks": []
+  "socialLinks": [
+    {
+      "label": "Github",
+      "icon": "Github",
+      "url": "https://github.com/haloo-cod/Nebula-Template"
+    }
+  ]
 }
